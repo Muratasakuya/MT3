@@ -50,6 +50,12 @@
     <ClCompile Include="Lib\Camera\Camera.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Collision\Collision.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Entities\Plane\Plane.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -129,5 +135,7 @@
     <ClInclude Include="Entities\Grid\Grid.h" />
     <ClInclude Include="Entities\Sphere\Sphere.h" />
     <ClInclude Include="Lib\Camera\Camera.h" />
+    <ClInclude Include="Collision\Collision.h" />
+    <ClInclude Include="Entities\Plane\Plane.h" />
   </ItemGroup>
 </Project>

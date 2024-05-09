@@ -26,17 +26,17 @@ void Sphere::DrawSphere(SphereInfo& sphere, const Matrix4x4& viewMatrix, const M
 
 			// world座標系でのa、b、cを求める
 			a.localPos_ =
-			{ sphere.radius_ * std::cos(lat) * std::cos(lon),sphere.radius_ * std::sin(lat),sphere.radius_ * std::cos(lat) * std::sin(lon) };
+			{ sphere.radius * std::cos(lat) * std::cos(lon),sphere.radius * std::sin(lat),sphere.radius * std::cos(lat) * std::sin(lon) };
 
 			a.localPos_ += sphere.center;
 
 			b.localPos_ =
-			{ sphere.radius_ * std::cos(lat + kLatEvery) * std::cos(lon),sphere.radius_ * std::sin(lat + kLatEvery),sphere.radius_ * std::cos(lat + kLatEvery) * std::sin(lon) };
+			{ sphere.radius * std::cos(lat + kLatEvery) * std::cos(lon),sphere.radius * std::sin(lat + kLatEvery),sphere.radius * std::cos(lat + kLatEvery) * std::sin(lon) };
 
 			b.localPos_ += sphere.center;
 
 			c.localPos_ =
-			{ sphere.radius_ * std::cos(lat) * std::cos(lon + kLonEvery),sphere.radius_ * std::sin(lat),sphere.radius_ * std::cos(lat) * std::sin(lon + kLonEvery) };
+			{ sphere.radius * std::cos(lat) * std::cos(lon + kLonEvery),sphere.radius * std::sin(lat),sphere.radius * std::cos(lat) * std::sin(lon + kLonEvery) };
 
 			c.localPos_ += sphere.center;
 

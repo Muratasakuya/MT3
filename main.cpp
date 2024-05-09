@@ -1,26 +1,12 @@
 #include "MyMath.h"
 
 #include "Sphere.h"
+#include "Plane.h"
 #include "Grid.h"
 #include "Camera.h"
+#include "Collision.h"
 
 const char kWindowTitle[] = "LE2B_26_ムラタ_サクヤ";
-
-// 当たり判定
-bool IsCollision(const SphereInfo& s1, const SphereInfo& s2) {
-
-	float distance = Length(s1.center - s2.center);
-
-	// 半径の合計より大きければ衝突
-	if (distance <= s1.radius_ + s2.radius_) {
-
-		return true;
-	}
-	else {
-
-		return false;
-	}
-}
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -34,18 +20,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	/*-------------------------------------------------------------*/
 	// カメラ
+
 	Camera camera;
 	// 初期化
 	camera.Init();
 
 	/*-------------------------------------------------------------*/
+	// 当たり判定
+
+	Collision collision;
+
+	/*-------------------------------------------------------------*/
 	// 球
 
-	SphereInfo sphereInfo[2];
-	sphereInfo[0] = { 1.0f,{2.0f,0.0f,0.0f},0xffffffff };
-	sphereInfo[1] = { 1.0f,{0.0f,0.0f,0.0f},0xffffffff };
+	SphereInfo sphereInfo;
+	sphereInfo = { 1.0f,{0.0f,0.0f,0.0f},0xffffffff };
 
-	Sphere sphere[2];
+	Sphere sphere;
+
+	/*-------------------------------------------------------------*/
+	// 平面
+
+	PlaneInfo planeInfo;
+	planeInfo = { {0.0f,1.0f,0.0f},1.0f };
+
+	Plane plane;
 
 	/*-------------------------------------------------------------*/
 	// グリッド線
@@ -68,15 +67,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		camera.Update();
 
 		// 当たり判定
-		if (IsCollision(sphereInfo[0], sphereInfo[1])) {
+		if (collision.Sphere2PlaneCheckCollision(sphereInfo, planeInfo)) {
 
 			// 当たっていれば赤
-			sphereInfo[0].color = 0xff0000ff;
+			sphereInfo.color = 0xff0000ff;
 		}
 		else {
 
 			// 当たっていなければ白
-			sphereInfo[0].color = 0xffffffff;
+			sphereInfo.color = 0xffffffff;
 		}
 
 		/*-------------------------------------------------------------*/
@@ -84,15 +83,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::Begin("Sphere1");
 
-		ImGui::SliderFloat3("translate", &sphereInfo[0].center.x, -10.0f, 10.0f);
-		ImGui::SliderFloat("radius", &sphereInfo[0].radius_, 0.0f, 10.0f);
+		ImGui::SliderFloat3("translate", &sphereInfo.center.x, -10.0f, 10.0f);
+		ImGui::SliderFloat("radius", &sphereInfo.radius, 0.0f, 10.0f);
 
 		ImGui::End();
 
-		ImGui::Begin("Sphere2");
+		ImGui::Begin("Plane");
 
-		ImGui::SliderFloat3("translate", &sphereInfo[1].center.x, -10.0f, 10.0f);
-		ImGui::SliderFloat("radius", &sphereInfo[1].radius_, 0.0f, 10.0f);
+		ImGui::DragFloat3("normal", &planeInfo.normal.x, 0.01f);
+		// 正規化する
+		planeInfo.normal = Normalize(planeInfo.normal);
+		ImGui::SliderFloat("distance", &planeInfo.distance, -1.5f, 1.5f);
 
 		ImGui::End();
 
@@ -102,10 +103,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// グリッド線の描画
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		// 球2つの描画
-		for (int i = 0; i < 2; i++) {
-			sphere[i].DrawSphere(sphereInfo[i], camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
-		}
+		// 平面の描画
+		plane.DrawPlane(planeInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+
+		// 球の描画
+		sphere.DrawSphere(sphereInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
 		Novice::EndFrame();

@@ -14,10 +14,17 @@
 // その他
 /*=========================================================================*/
 
+/// 平面
+struct PlaneInfo{
+
+	Vector3 normal;
+	float distance;
+};
+
 /// 球
 struct SphereInfo {
 
-	float radius_;
+	float radius;
 	Vector3 center;
 	uint32_t color;
 };
@@ -53,6 +60,9 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 
 /// 最近接点
 Vector3 ClosestPoint(const Vector3& point, const Segement& segment);
+
+// 法線と垂直なベクトル
+Vector3 Perpendicular(const Vector3& v);
 
 /*=========================================================================*/
 // マトリックス
