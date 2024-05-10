@@ -1,3 +1,5 @@
+#define NOMINMAX
+
 #include "Collision.h"
 
 /// <summary>
@@ -42,4 +44,19 @@ bool Collision::Sphere2PlaneCheckCollision(const SphereInfo& sphere, const Plane
 
 		return false;
 	}
+}
+
+/// <summary>
+/// 平面と線の当たり判定
+/// </summary>
+/// <param name="plane"></param>
+/// <param name="segment"></param>
+/// <returns></returns>
+bool Collision::Plane2LineCheckCollision(const PlaneInfo& plane, const LineInfo& line) {
+
+	float dot = Dot(plane.normal, line.diff - line.origin);
+
+	float t = (plane.distance - Dot(plane.normal, line.origin)) / dot;
+
+	return (t >= 0.0f && t <= 1.0f);
 }

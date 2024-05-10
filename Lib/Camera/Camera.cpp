@@ -94,8 +94,8 @@ void Camera::Init() {
 
 	// アフィン
 	scale_ = { 1.0f,1.0f,1.0f };
-	rotate_ = { 0.26f,0.0f,0.0f };
-	translate_ = { 0.0f,1.9f,-6.49f };
+	rotate_ = { -0.058f,-0.091f,0.0f };
+	translate_ = { 0.0f,0.99f,-6.49f };
 
 	cameraMatrix_ =
 		MakeAffineMatrix(scale_, rotate_, translate_);

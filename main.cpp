@@ -3,6 +3,7 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "Grid.h"
+#include "Line.h"
 #include "Camera.h"
 #include "Collision.h"
 
@@ -31,20 +32,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Collision collision;
 
 	/*-------------------------------------------------------------*/
-	// 球
-
-	SphereInfo sphereInfo;
-	sphereInfo = { 1.0f,{0.0f,0.0f,0.0f},0xffffffff };
-
-	Sphere sphere;
-
-	/*-------------------------------------------------------------*/
 	// 平面
 
 	PlaneInfo planeInfo;
 	planeInfo = { {0.0f,1.0f,0.0f},1.0f };
 
 	Plane plane;
+
+	/*-------------------------------------------------------------*/
+	// ライン
+
+	LineInfo lineInfo;
+	lineInfo = { {-0.45f,0.41f,0.0f },{1.0f,0.58f,0.0f},LineType::LineSegment ,0xffffffff };
+
+	Line line;
 
 	/*-------------------------------------------------------------*/
 	// グリッド線
@@ -67,26 +68,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		camera.Update();
 
 		// 当たり判定
-		if (collision.Sphere2PlaneCheckCollision(sphereInfo, planeInfo)) {
+		if (collision.Plane2LineCheckCollision(planeInfo, lineInfo)) {
 
-			// 当たっていれば赤
-			sphereInfo.color = 0xff0000ff;
+			lineInfo.color = 0xff0000ff;
 		}
 		else {
 
-			// 当たっていなければ白
-			sphereInfo.color = 0xffffffff;
+			lineInfo.color = 0xffffffff;
 		}
 
 		/*-------------------------------------------------------------*/
 		// ImGui
-
-		ImGui::Begin("Sphere1");
-
-		ImGui::SliderFloat3("translate", &sphereInfo.center.x, -10.0f, 10.0f);
-		ImGui::SliderFloat("radius", &sphereInfo.radius, 0.0f, 10.0f);
-
-		ImGui::End();
 
 		ImGui::Begin("Plane");
 
@@ -94,6 +86,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 正規化する
 		planeInfo.normal = Normalize(planeInfo.normal);
 		ImGui::SliderFloat("distance", &planeInfo.distance, -1.5f, 1.5f);
+
+		ImGui::End();
+
+		ImGui::Begin("Line");
+
+		ImGui::DragFloat3("origin", &lineInfo.origin.x, 0.01f);
+		ImGui::DragFloat3("diff", &lineInfo.diff.x, 0.01f);
 
 		ImGui::End();
 
@@ -106,8 +105,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 平面の描画
 		plane.DrawPlane(planeInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		// 球の描画
-		sphere.DrawSphere(sphereInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+		// ラインの描画
+		line.DrawLine(lineInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
 		Novice::EndFrame();

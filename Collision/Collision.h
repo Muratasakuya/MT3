@@ -20,4 +20,7 @@ public:
 
 	// 球と平面の当たり判定
 	bool Sphere2PlaneCheckCollision(const SphereInfo& sphere, const PlaneInfo& plane);
+
+	// 平面と線の当たり判定
+	bool Plane2LineCheckCollision(const PlaneInfo& plane, const LineInfo& line);
 };

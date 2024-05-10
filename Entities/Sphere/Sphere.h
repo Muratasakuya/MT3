@@ -16,7 +16,6 @@ private:
 	struct Point {
 
 		Matrix4x4 worldMatrix_;
-		Matrix4x4 worldViewProjectionMatrix_;
 
 		Vector3 localPos_;
 		Vector3 screenPos_;

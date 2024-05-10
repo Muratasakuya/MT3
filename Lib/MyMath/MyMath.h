@@ -14,8 +14,15 @@
 // その他
 /*=========================================================================*/
 
+/// lineの種類
+enum class LineType {
+
+	Ray,        // 半直線
+	LineSegment // 線分
+};
+
 /// 平面
-struct PlaneInfo{
+struct PlaneInfo {
 
 	Vector3 normal;
 	float distance;
@@ -30,10 +37,21 @@ struct SphereInfo {
 };
 
 /// 線分
-struct Segement {
+struct Segment {
 
 	Vector3 origin; // 始点
 	Vector3 diff;   // 終点への差分ベクトル
+};
+
+/// 線
+struct LineInfo {
+
+	Vector3 origin; // 始点
+	Vector3 diff;   // 終点への差分ベクトル
+
+	LineType type;
+
+	uint32_t color;
 };
 
 /// πの値の取得
@@ -59,7 +77,7 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2);
 Vector3 Project(const Vector3& v1, const Vector3& v2);
 
 /// 最近接点
-Vector3 ClosestPoint(const Vector3& point, const Segement& segment);
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
 // 法線と垂直なベクトル
 Vector3 Perpendicular(const Vector3& v);

@@ -54,7 +54,7 @@ Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	return projectionA;
 }
 /// 最近接点
-Vector3 ClosestPoint(const Vector3& point, const Segement& segment) {
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 
 	Vector3 projection = segment.origin + Project(point - segment.origin, segment.diff);
 
