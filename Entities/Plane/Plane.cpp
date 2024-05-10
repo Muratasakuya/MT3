@@ -28,7 +28,7 @@ void Plane::DrawPlane(const PlaneInfo& plane, const Matrix4x4& viewMatrix, const
 
 	// 左0 右1 奥2 手前 3
 
-	Novice::DrawTriangle(
+	/*Novice::DrawTriangle(
 		static_cast<int>(points[2].x), static_cast<int>(points[2].y),
 		static_cast<int>(points[1].x), static_cast<int>(points[1].y),
 		static_cast<int>(points[3].x), static_cast<int>(points[3].y),
@@ -39,7 +39,7 @@ void Plane::DrawPlane(const PlaneInfo& plane, const Matrix4x4& viewMatrix, const
 		static_cast<int>(points[0].x), static_cast<int>(points[0].y),
 		static_cast<int>(points[3].x), static_cast<int>(points[3].y),
 		0xffffffff, kFillModeSolid
-	);
+	);*/
 
 	// pointsを結んで描画
 	Novice::DrawLine(

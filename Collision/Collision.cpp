@@ -58,5 +58,11 @@ bool Collision::Plane2LineCheckCollision(const PlaneInfo& plane, const LineInfo&
 
 	float t = (plane.distance - Dot(plane.normal, line.origin)) / dot;
 
-	return (t >= 0.0f && t <= 1.0f);
+	// 線分
+	if (t >= 0.0f && t <= 1.0f && line.type == LineType::LineSegment) {
+
+		return true;
+	}
+
+	return false;
 }
