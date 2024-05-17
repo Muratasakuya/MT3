@@ -1,9 +1,9 @@
 #include "MyMath.h"
 
 #include "Sphere.h"
-#include "Plane.h"
 #include "Grid.h"
 #include "Line.h"
+#include "Triangle.h"
 #include "Camera.h"
 #include "Collision.h"
 
@@ -32,12 +32,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Collision collision;
 
 	/*-------------------------------------------------------------*/
-	// 平面
+	// 三角形
 
-	PlaneInfo planeInfo;
-	planeInfo = { {0.0f,1.0f,0.0f},1.0f };
+	TriangleInfo triangleInfo;
+	triangleInfo.vertices[0] = { 0.0f,1.0f,0.0f };
+	triangleInfo.vertices[1] = { 1.0f,0.0f,0.0f };
+	triangleInfo.vertices[2] = { -1.0f,0.0f,0.0f };
 
-	Plane plane;
+	Triangle triangle;
+	// 初期化
+	triangle.Initialize(triangleInfo);
 
 	/*-------------------------------------------------------------*/
 	// ライン
@@ -67,27 +71,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// カメラの更新処理
 		camera.Update();
 
-		// 当たり判定
-		if (collision.Plane2LineCheckCollision(planeInfo, lineInfo)) {
+		// 三角形と線の当たり判定
+		if (collision.Triangle2LineCheckCollision(triangleInfo, lineInfo)) {
 
-			lineInfo.color = 0xff0000ff;
-		}
-		else {
+			lineInfo.color = 0x00ffffff;
+		} else {
 
 			lineInfo.color = 0xffffffff;
 		}
 
 		/*-------------------------------------------------------------*/
 		// ImGui
-
-		ImGui::Begin("Plane");
-
-		ImGui::DragFloat3("normal", &planeInfo.normal.x, 0.01f);
-		// 正規化する
-		planeInfo.normal = Normalize(planeInfo.normal);
-		ImGui::SliderFloat("distance", &planeInfo.distance, -1.5f, 1.5f);
-
-		ImGui::End();
 
 		ImGui::Begin("Line");
 
@@ -102,8 +96,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// グリッド線の描画
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		// 平面の描画
-		plane.DrawPlane(planeInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+		// 三角形の描画
+		triangle.DrawTriangle(triangleInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// ラインの描画
 		line.DrawLine(lineInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());

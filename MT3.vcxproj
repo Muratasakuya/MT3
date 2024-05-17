@@ -61,7 +61,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)/Collision;$(ProjectDir)/Entities/Line;$(ProjectDir)/Entities/Plane;$(ProjectDir)/Entities/Sphere;$(ProjectDir)/Entities/Grid;$(ProjectDir)/Lib/Matrix;$(ProjectDir)/Lib/Vector;$(ProjectDir)/Lib/MyMath;$(ProjectDir)/Lib/Camera;$(ProjectDir);C:\KamataEngine\DirectXGame\math;C:\KamataEngine\DirectXGame\2d;C:\KamataEngine\DirectXGame\3d;C:\KamataEngine\DirectXGame\audio;C:\KamataEngine\DirectXGame\base;C:\KamataEngine\DirectXGame\input;C:\KamataEngine\DirectXGame\scene;C:\KamataEngine\External\DirectXTex\include;C:\KamataEngine\External\imgui;C:\KamataEngine\Adapter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/Collision;$(ProjectDir)/Entities/Triangle;$(ProjectDir)/Entities/Line;$(ProjectDir)/Entities/Plane;$(ProjectDir)/Entities/Sphere;$(ProjectDir)/Entities/Grid;$(ProjectDir)/Lib/Matrix;$(ProjectDir)/Lib/Vector;$(ProjectDir)/Lib/MyMath;$(ProjectDir)/Lib/Camera;$(ProjectDir);C:\KamataEngine\DirectXGame\math;C:\KamataEngine\DirectXGame\2d;C:\KamataEngine\DirectXGame\3d;C:\KamataEngine\DirectXGame\audio;C:\KamataEngine\DirectXGame\base;C:\KamataEngine\DirectXGame\input;C:\KamataEngine\DirectXGame\scene;C:\KamataEngine\External\DirectXTex\include;C:\KamataEngine\External\imgui;C:\KamataEngine\Adapter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -123,6 +123,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="Lib\MyMath\MyMath.cpp" />
     <ClCompile Include="Entities\Sphere\Sphere.cpp" />
     <ClCompile Include="Entities\Plane\Plane.cpp" />
+    <ClCompile Include="Entities\Triangle\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\base\StringUtility.h" />
@@ -161,6 +162,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="Entities\Sphere\Sphere.h" />
     <ClInclude Include="Entities\Plane\Plane.h" />
     <ClInclude Include="Entities\Line\Line.h" />
+    <ClInclude Include="Entities\Triangle\Triangle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -21,6 +21,12 @@ enum class LineType {
 	LineSegment // 線分
 };
 
+/// 三角形
+struct TriangleInfo{
+
+	Vector3 vertices[3];
+};
+
 /// 平面
 struct PlaneInfo {
 

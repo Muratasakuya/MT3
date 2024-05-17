@@ -23,4 +23,7 @@ public:
 
 	// 平面と線の当たり判定
 	bool Plane2LineCheckCollision(const PlaneInfo& plane, const LineInfo& line);
+
+	// 三角形と線の当たり判定
+	bool Triangle2LineCheckCollision(const TriangleInfo& triangle, const LineInfo& line);
 };
