@@ -22,7 +22,7 @@ enum class LineType {
 };
 
 /// 三角形
-struct TriangleInfo{
+struct TriangleInfo {
 
 	Vector3 vertices[3];
 };
@@ -58,6 +58,12 @@ struct LineInfo {
 	LineType type;
 
 	uint32_t color;
+};
+
+struct AABBInfo {
+
+	Vector3 min;
+	Vector3 max;
 };
 
 /// πの値の取得

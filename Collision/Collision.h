@@ -26,4 +26,7 @@ public:
 
 	// 三角形と線の当たり判定
 	bool Triangle2LineCheckCollision(const TriangleInfo& triangle, const LineInfo& line);
+
+	// AABB同士の当たり判定
+	bool AABB2AABBCheckCollision(const AABBInfo& aabb1, const AABBInfo& aabb2);
 };

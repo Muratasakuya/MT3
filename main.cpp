@@ -1,5 +1,6 @@
 #include "MyMath.h"
 
+#include "AABB.h"
 #include "Sphere.h"
 #include "Grid.h"
 #include "Line.h"
@@ -32,24 +33,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Collision collision;
 
 	/*-------------------------------------------------------------*/
-	// 三角形
+	// AABB
 
-	TriangleInfo triangleInfo;
-	triangleInfo.vertices[0] = { 0.0f,1.0f,0.0f };
-	triangleInfo.vertices[1] = { 1.0f,0.0f,0.0f };
-	triangleInfo.vertices[2] = { -1.0f,0.0f,0.0f };
+	AABBInfo aabb1Info;
+	aabb1Info = {
+		.min{-0.5f,-0.5f,-0.5f},
+		.max{0.0f,0.0f,0.0f}
+	};
+	uint32_t aabb1Color = 0xffffffff;
 
-	Triangle triangle;
-	// 初期化
-	triangle.Initialize(triangleInfo);
+	AABBInfo aabb2Info;
+	aabb2Info = {
+		.min{0.2f,0.2f,0.2f},
+		.max{1.0f,1.0f,1.0f}
+	};
+	uint32_t aabb2Color = 0xffffffff;
 
-	/*-------------------------------------------------------------*/
-	// ライン
-
-	LineInfo lineInfo;
-	lineInfo = { {-0.45f,0.41f,0.0f },{1.0f,0.58f,0.0f},LineType::LineSegment ,0xffffffff };
-
-	Line line;
+	AABB aabb1;
+	AABB aabb2;
 
 	/*-------------------------------------------------------------*/
 	// グリッド線
@@ -71,24 +72,47 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// カメラの更新処理
 		camera.Update();
 
-		// 三角形と線の当たり判定
-		if (collision.Triangle2LineCheckCollision(triangleInfo, lineInfo)) {
+		// AABB同士の当たり判定
+		if (collision.AABB2AABBCheckCollision(aabb1Info, aabb2Info)) {
 
-			lineInfo.color = 0x00ffffff;
+			aabb1Color = 0x00ffffff;
 		} else {
 
-			lineInfo.color = 0xffffffff;
+			aabb1Color = 0xffffffff;
 		}
 
 		/*-------------------------------------------------------------*/
 		// ImGui
 
-		ImGui::Begin("Line");
+		ImGui::Begin("AABB");
 
-		ImGui::DragFloat3("origin", &lineInfo.origin.x, 0.01f);
-		ImGui::DragFloat3("diff", &lineInfo.diff.x, 0.01f);
+		ImGui::DragFloat3("aabb1.min", &aabb1Info.min.x,0.1f);
+		ImGui::DragFloat3("aabb1.max", &aabb1Info.max.x, 0.1f);
+		ImGui::DragFloat3("aabb2.min", &aabb2Info.min.x, 0.1f);
+		ImGui::DragFloat3("aabb2.max", &aabb2Info.max.x, 0.1f);
 
 		ImGui::End();
+
+#pragma region /// 値の制限 ///
+		// 値の制限
+		aabb1Info.min.x = (std::min)(aabb1Info.min.x, aabb1Info.max.x);
+		aabb1Info.max.x = (std::max)(aabb1Info.min.x, aabb1Info.max.x);
+
+		aabb1Info.min.y = (std::min)(aabb1Info.min.y, aabb1Info.max.y);
+		aabb1Info.max.y = (std::max)(aabb1Info.min.y, aabb1Info.max.y);
+
+		aabb1Info.min.z = (std::min)(aabb1Info.min.z, aabb1Info.max.z);
+		aabb1Info.max.z = (std::max)(aabb1Info.min.z, aabb1Info.max.z);
+
+		aabb2Info.min.x = (std::min)(aabb2Info.min.x, aabb2Info.max.x);
+		aabb2Info.max.x = (std::max)(aabb2Info.min.x, aabb2Info.max.x);
+
+		aabb2Info.min.y = (std::min)(aabb2Info.min.y, aabb2Info.max.y);
+		aabb2Info.max.y = (std::max)(aabb2Info.min.y, aabb2Info.max.y);
+
+		aabb2Info.min.z = (std::min)(aabb2Info.min.z, aabb2Info.max.z);
+		aabb2Info.max.z = (std::max)(aabb2Info.min.z, aabb2Info.max.z);
+#pragma endregion
 
 		/*-------------------------------------------------------------*/
 		// 描画処理
@@ -96,11 +120,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// グリッド線の描画
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		// 三角形の描画
-		triangle.DrawTriangle(triangleInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+		aabb1.DrawAABB(aabb1Info, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), aabb1Color);
+		aabb2.DrawAABB(aabb2Info, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), aabb2Color);
 
-		// ラインの描画
-		line.DrawLine(lineInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
 		Novice::EndFrame();

@@ -120,3 +120,21 @@ bool Collision::Triangle2LineCheckCollision(const TriangleInfo& triangle, const 
 
 	return false;
 }
+
+/// <summary>
+/// AABB同士の当たり判定
+/// </summary>
+/// <param name="aabb1"></param>
+/// <param name="aabb2"></param>
+/// <returns></returns>
+bool Collision::AABB2AABBCheckCollision(const AABBInfo& aabb1, const AABBInfo& aabb2) {
+
+	if ((aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) &&
+		(aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y) &&
+		(aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z)) {
+
+		return true;
+	}
+
+	return false;
+}
