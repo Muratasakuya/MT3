@@ -29,4 +29,7 @@ public:
 
 	// AABB同士の当たり判定
 	bool AABB2AABBCheckCollision(const AABBInfo& aabb1, const AABBInfo& aabb2);
+
+	// AABBと球の当たり判定
+	bool AABB2SphereCheckCollision(const AABBInfo& aabb, const SphereInfo& sphere);
 };

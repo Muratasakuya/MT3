@@ -35,22 +35,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	/*-------------------------------------------------------------*/
 	// AABB
 
-	AABBInfo aabb1Info;
-	aabb1Info = {
+	AABBInfo aabbInfo;
+	aabbInfo = {
 		.min{-0.5f,-0.5f,-0.5f},
 		.max{0.0f,0.0f,0.0f}
 	};
-	uint32_t aabb1Color = 0xffffffff;
+	uint32_t aabbColor = 0xffffffff;
 
-	AABBInfo aabb2Info;
-	aabb2Info = {
-		.min{0.2f,0.2f,0.2f},
-		.max{1.0f,1.0f,1.0f}
-	};
-	uint32_t aabb2Color = 0xffffffff;
+	AABB aabb;
 
-	AABB aabb1;
-	AABB aabb2;
+	/*-------------------------------------------------------------*/
+	// 球
+
+	SphereInfo sphereInfo;
+	sphereInfo = { 1.0f,{0.0f,0.0f,0.0f},0xffffffff };
+
+	Sphere sphere;
 
 	/*-------------------------------------------------------------*/
 	// グリッド線
@@ -73,12 +73,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		camera.Update();
 
 		// AABB同士の当たり判定
-		if (collision.AABB2AABBCheckCollision(aabb1Info, aabb2Info)) {
+		if (collision.AABB2SphereCheckCollision(aabbInfo, sphereInfo)) {
 
-			aabb1Color = 0x00ffffff;
+			aabbColor = 0x00ffffff;
 		} else {
 
-			aabb1Color = 0xffffffff;
+			aabbColor = 0xffffffff;
 		}
 
 		/*-------------------------------------------------------------*/
@@ -86,32 +86,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::Begin("AABB");
 
-		ImGui::DragFloat3("aabb1.min", &aabb1Info.min.x,0.1f);
-		ImGui::DragFloat3("aabb1.max", &aabb1Info.max.x, 0.1f);
-		ImGui::DragFloat3("aabb2.min", &aabb2Info.min.x, 0.1f);
-		ImGui::DragFloat3("aabb2.max", &aabb2Info.max.x, 0.1f);
+		ImGui::DragFloat3("aabb1.min", &aabbInfo.min.x,0.1f);
+		ImGui::DragFloat3("aabb1.max", &aabbInfo.max.x, 0.1f);
+		ImGui::DragFloat3("sphere.center", &sphereInfo.center.x, 0.1f);
+		ImGui::DragFloat("sphere.radius", &sphereInfo.radius, 0.1f);
 
 		ImGui::End();
 
 #pragma region /// 値の制限 ///
 		// 値の制限
-		aabb1Info.min.x = (std::min)(aabb1Info.min.x, aabb1Info.max.x);
-		aabb1Info.max.x = (std::max)(aabb1Info.min.x, aabb1Info.max.x);
+		aabbInfo.min.x = (std::min)(aabbInfo.min.x, aabbInfo.max.x);
+		aabbInfo.max.x = (std::max)(aabbInfo.min.x, aabbInfo.max.x);
 
-		aabb1Info.min.y = (std::min)(aabb1Info.min.y, aabb1Info.max.y);
-		aabb1Info.max.y = (std::max)(aabb1Info.min.y, aabb1Info.max.y);
+		aabbInfo.min.y = (std::min)(aabbInfo.min.y, aabbInfo.max.y);
+		aabbInfo.max.y = (std::max)(aabbInfo.min.y, aabbInfo.max.y);
 
-		aabb1Info.min.z = (std::min)(aabb1Info.min.z, aabb1Info.max.z);
-		aabb1Info.max.z = (std::max)(aabb1Info.min.z, aabb1Info.max.z);
-
-		aabb2Info.min.x = (std::min)(aabb2Info.min.x, aabb2Info.max.x);
-		aabb2Info.max.x = (std::max)(aabb2Info.min.x, aabb2Info.max.x);
-
-		aabb2Info.min.y = (std::min)(aabb2Info.min.y, aabb2Info.max.y);
-		aabb2Info.max.y = (std::max)(aabb2Info.min.y, aabb2Info.max.y);
-
-		aabb2Info.min.z = (std::min)(aabb2Info.min.z, aabb2Info.max.z);
-		aabb2Info.max.z = (std::max)(aabb2Info.min.z, aabb2Info.max.z);
+		aabbInfo.min.z = (std::min)(aabbInfo.min.z, aabbInfo.max.z);
+		aabbInfo.max.z = (std::max)(aabbInfo.min.z, aabbInfo.max.z);
 #pragma endregion
 
 		/*-------------------------------------------------------------*/
@@ -120,9 +111,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// グリッド線の描画
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		aabb1.DrawAABB(aabb1Info, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), aabb1Color);
-		aabb2.DrawAABB(aabb2Info, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), aabb2Color);
+		// AABBびの描画
+		aabb.DrawAABB(aabbInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), aabbColor);
 
+		// 球の描画
+		sphere.DrawSphere(sphereInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
 		Novice::EndFrame();
