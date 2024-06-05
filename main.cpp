@@ -1,5 +1,6 @@
 #include "MyMath.h"
 
+#include "Bezier.h"
 #include "AABB.h"
 #include "Sphere.h"
 #include "Grid.h"
@@ -28,34 +29,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	camera.Init();
 
 	/*-------------------------------------------------------------*/
-	// 当たり判定
-
-	Collision collision;
-
-	/*-------------------------------------------------------------*/
-	// AABB
-
-	AABBInfo aabbInfo;
-	aabbInfo = {
-		.min{-0.5f,-0.5f,-0.5f},
-		.max{0.5f,0.5f,0.5f}
-	};
-	uint32_t aabbColor = 0xffffffff;
-
-	AABB aabb;
-
-	/*-------------------------------------------------------------*/
-	// 線
-
-	LineInfo lineInfo;
-	lineInfo = { {-0.7f,0.3f,0.0f },{2.0f,-0.5f,0.0f},LineType::LineSegment ,0xffffffff };
-
-	Line line;
-
-	/*-------------------------------------------------------------*/
 	// グリッド線
 
 	Grid grid;
+
+	/*-------------------------------------------------------------*/
+	// ベジェ曲線
+
+	// 各制御点
+	Vector3 controlPoints[3] = {
+		{-0.8f,0.58f,1.0f},
+		{1.76f,1.0f,-0.3f},
+		{0.94f,-0.7f,2.3f},
+	};
+
+	// 制御点の球
+	SphereInfo sphereInfo[3];
+	Sphere sphere[3];
+	for (int i = 0; i < 3; i++) {
+
+		sphereInfo[i] = { 0.01f,controlPoints[i],0x000000ff };
+	}
+	
+	Bezier bezier;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -72,38 +68,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// カメラの更新処理
 		camera.Update();
 
-		// AABBと線の当たり判定
-		if (collision.AABB2LineCheckCollision(aabbInfo, lineInfo)) {
-
-			aabbColor = 0x00ffffff;
-		} else {
-
-			aabbColor = 0xffffffff;
-		}
 
 		/*-------------------------------------------------------------*/
 		// ImGui
 
-		ImGui::Begin("AABB");
+		ImGui::Begin("Bezier");
 
-		ImGui::DragFloat3("aabb1.min", &aabbInfo.min.x,0.1f);
-		ImGui::DragFloat3("aabb1.max", &aabbInfo.max.x, 0.1f);
-		ImGui::DragFloat3("origin", &lineInfo.origin.x, 0.01f);
-		ImGui::DragFloat3("diff", &lineInfo.diff.x, 0.01f);
+		ImGui::DragFloat3("controlPoints[0]", &controlPoints[0].x, 0.1f);
+		ImGui::DragFloat3("controlPoints[1]", &controlPoints[1].x, 0.1f);
+		ImGui::DragFloat3("controlPoints[2]", &controlPoints[2].x, 0.1f);
 
 		ImGui::End();
 
-#pragma region /// 値の制限 ///
-		// 値の制限
-		aabbInfo.min.x = (std::min)(aabbInfo.min.x, aabbInfo.max.x);
-		aabbInfo.max.x = (std::max)(aabbInfo.min.x, aabbInfo.max.x);
+		// 制御点の更新
+		for (int i = 0; i < 3; i++) {
 
-		aabbInfo.min.y = (std::min)(aabbInfo.min.y, aabbInfo.max.y);
-		aabbInfo.max.y = (std::max)(aabbInfo.min.y, aabbInfo.max.y);
-
-		aabbInfo.min.z = (std::min)(aabbInfo.min.z, aabbInfo.max.z);
-		aabbInfo.max.z = (std::max)(aabbInfo.min.z, aabbInfo.max.z);
-#pragma endregion
+			sphereInfo[i] = { 0.01f,controlPoints[i],0x000000ff };
+		}
 
 		/*-------------------------------------------------------------*/
 		// 描画処理
@@ -111,11 +92,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// グリッド線の描画
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		// AABBびの描画
-		aabb.DrawAABB(aabbInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), aabbColor);
+		// ベジェ曲線の描画
+		bezier.DrawBezier(
+			controlPoints[0], controlPoints[1], controlPoints[2],
+			camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), 0x0000ffff);
 
-		// ラインの描画
-		line.DrawLine(lineInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+		// 制御点の球の描画
+		for (int i = 0; i < 3; i++) {
+
+			sphere[i].DrawSphere(sphereInfo[i], camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+		}
 
 		// フレームの終了
 		Novice::EndFrame();

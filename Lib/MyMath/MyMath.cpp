@@ -16,9 +16,17 @@ float Length(const Vector3& v) {
 
 	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 }
+
+
+/// 線形補間関数
+float Lerp(float a, float b, float t) { return a + (b - a) * t; }
+
 /*=========================================================================*/
 // ベクトル
 /*=========================================================================*/
+
+/// Vector3線形補間関数
+Vector3 Vector3Lerp(const Vector3& a, const Vector3& b, float t) { return { Lerp(a.x, b.x, t), Lerp(a.y, b.y, t), Lerp(a.z, b.z, t) }; }
 
 /// 正規化
 Vector3 Normalize(const Vector3& v) {

@@ -75,9 +75,15 @@ float Dot(const Vector3& v1, const Vector3& v2);
 /// 長さ、ノルム
 float Length(const Vector3& v);
 
+/// 線形補間関数
+float Lerp(float a, float b, float t);
+
 /*=========================================================================*/
 // ベクトル
 /*=========================================================================*/
+
+/// Vector3線形補間関数
+Vector3 Vector3Lerp(const Vector3& a, const Vector3& b, float t);
 
 /// 正規化
 Vector3 Normalize(const Vector3& v);
