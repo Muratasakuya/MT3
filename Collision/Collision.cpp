@@ -165,3 +165,30 @@ bool Collision::AABB2SphereCheckCollision(const AABBInfo& aabb, const SphereInfo
 
 	return false;
 }
+
+/// <summary>
+/// AABBと線の当たり判定
+/// </summary>
+/// <param name="aabb"></param>
+/// <param name="line"></param>
+/// <returns></returns>
+bool Collision::AABB2LineCheckCollision(const AABBInfo& aabb, const LineInfo& line) {
+
+	float txMin = (aabb.min.x - line.origin.x) / (line.diff.x - line.origin.x);
+	float txMax = (aabb.max.x - line.origin.x) / (line.diff.x - line.origin.x);
+	if (txMin > txMax) std::swap(txMin, txMax);
+
+	float tyMin = (aabb.min.y - line.origin.y) / (line.diff.y - line.origin.y);
+	float tyMax = (aabb.max.y - line.origin.y) / (line.diff.y - line.origin.y);
+	if (tyMin > tyMax) std::swap(tyMin, tyMax);
+
+	float tzMin = (aabb.min.z - line.origin.z) / (line.diff.z - line.origin.z);
+	float tzMax = (aabb.max.z - line.origin.z) / (line.diff.z - line.origin.z);
+	if (tzMin > tzMax) std::swap(tzMin, tzMax);
+
+	float tNear = std::max({ txMin, tyMin, tzMin });
+	float tFar = std::min({ txMax, tyMax, tzMax });
+
+	// 交差しているかを確認
+	return (tNear <= tFar && tFar >= 0.0f && tNear <= 1.0f);
+}

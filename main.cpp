@@ -38,19 +38,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	AABBInfo aabbInfo;
 	aabbInfo = {
 		.min{-0.5f,-0.5f,-0.5f},
-		.max{0.0f,0.0f,0.0f}
+		.max{0.5f,0.5f,0.5f}
 	};
 	uint32_t aabbColor = 0xffffffff;
 
 	AABB aabb;
 
 	/*-------------------------------------------------------------*/
-	// 球
+	// 線
 
-	SphereInfo sphereInfo;
-	sphereInfo = { 1.0f,{0.0f,0.0f,0.0f},0xffffffff };
+	LineInfo lineInfo;
+	lineInfo = { {-0.7f,0.3f,0.0f },{2.0f,-0.5f,0.0f},LineType::LineSegment ,0xffffffff };
 
-	Sphere sphere;
+	Line line;
 
 	/*-------------------------------------------------------------*/
 	// グリッド線
@@ -72,8 +72,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// カメラの更新処理
 		camera.Update();
 
-		// AABB同士の当たり判定
-		if (collision.AABB2SphereCheckCollision(aabbInfo, sphereInfo)) {
+		// AABBと線の当たり判定
+		if (collision.AABB2LineCheckCollision(aabbInfo, lineInfo)) {
 
 			aabbColor = 0x00ffffff;
 		} else {
@@ -88,8 +88,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::DragFloat3("aabb1.min", &aabbInfo.min.x,0.1f);
 		ImGui::DragFloat3("aabb1.max", &aabbInfo.max.x, 0.1f);
-		ImGui::DragFloat3("sphere.center", &sphereInfo.center.x, 0.1f);
-		ImGui::DragFloat("sphere.radius", &sphereInfo.radius, 0.1f);
+		ImGui::DragFloat3("origin", &lineInfo.origin.x, 0.01f);
+		ImGui::DragFloat3("diff", &lineInfo.diff.x, 0.01f);
 
 		ImGui::End();
 
@@ -114,8 +114,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// AABBびの描画
 		aabb.DrawAABB(aabbInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), aabbColor);
 
-		// 球の描画
-		sphere.DrawSphere(sphereInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+		// ラインの描画
+		line.DrawLine(lineInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
 		Novice::EndFrame();
