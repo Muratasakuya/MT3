@@ -239,3 +239,60 @@ bool Collision::OBB2SphereCheckCollision(const Vector3& rotate, const OBBInfo& o
 
 	return distanceSquared <= (sphere.radius * sphere.radius);
 }
+
+/// <summary>
+/// OBBと線の当たり判定
+/// </summary>
+/// <param name="rotate"></param>
+/// <param name="obb"></param>
+/// <param name="line"></param>
+/// <returns></returns>
+bool Collision::OBB2LineCheckCollision(const Vector3& rotate, const OBBInfo& obb, const LineInfo& line) {
+
+	// 回転行列の計算（オイラー角から回転行列を計算）
+	Matrix4x4 rotateX = MakePitchMatrix(rotate.x);
+	Matrix4x4 rotateY = MakeYawMatrix(rotate.y);
+	Matrix4x4 rotateZ = MakeRollMatrix(rotate.z);
+	Matrix4x4 rotateMatrix = Multiply(rotateX, Multiply(rotateY, rotateZ));
+
+	// OBBの軸を回転させる
+	Vector3 orientations[3];
+	orientations[0] = Transform(obb.orientations[0], rotateMatrix);
+	orientations[1] = Transform(obb.orientations[1], rotateMatrix);
+	orientations[2] = Transform(obb.orientations[2], rotateMatrix);
+
+	// 線分の始点と終点をOBBのローカル座標系に変換
+	Vector3 lineStartLocal = line.origin - obb.center;
+	Vector3 lineEndLocal = lineStartLocal + line.diff;
+
+	// 各軸ごとにローカル座標に変換
+	Vector3 lineStartTransformed = { Dot(lineStartLocal, orientations[0]), Dot(lineStartLocal, orientations[1]), Dot(lineStartLocal, orientations[2]) };
+	Vector3 lineEndTransformed = { Dot(lineEndLocal, orientations[0]), Dot(lineEndLocal, orientations[1]), Dot(lineEndLocal, orientations[2]) };
+
+	// 線分とAABBの当たり判定
+	Vector3 boxMin = { -obb.size.x, -obb.size.y, -obb.size.z };
+	Vector3 boxMax = { obb.size.x, obb.size.y, obb.size.z };
+
+	// 線分とAABBの当たり判定を行う（Slab method）
+	float tMin = 0.0f;
+	float tMax = 1.0f;
+
+	for (int i = 0; i < 3; ++i) {
+		float start = (&lineStartTransformed.x)[i];
+		float end = (&lineEndTransformed.x)[i];
+		float min = (&boxMin.x)[i];
+		float max = (&boxMax.x)[i];
+
+		float t0 = (min - start) / (end - start);
+		float t1 = (max - start) / (end - start);
+
+		if (t0 > t1) std::swap(t0, t1);
+
+		tMin = t0 > tMin ? t0 : tMin;
+		tMax = t1 < tMax ? t1 : tMax;
+
+		if (tMin > tMax) return false;
+	}
+
+	return true;
+}

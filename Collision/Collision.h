@@ -38,4 +38,7 @@ public:
 
 	// OBBと球の当たり判定
 	bool OBB2SphereCheckCollision(const Vector3& rotate,const OBBInfo& obb, const SphereInfo& sphere);
+
+	// OBBと線の当たり判定
+	bool OBB2LineCheckCollision(const Vector3& rotate, const OBBInfo& obb, const LineInfo& line);
 };

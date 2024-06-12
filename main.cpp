@@ -54,17 +54,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	obb.SetTranslate(obbInfo.center);
 
 	/*-------------------------------------------------------------*/
-	// 球
+	// 線
 
-	SphereInfo sphereInfo;
-	sphereInfo = {
-
-		.radius{0.5f},
-		.center{0.0f,0.0f,0.0f},
+	LineInfo lineInfo;
+	lineInfo = {
+		.origin{-0.8f,-0.3f,0.0f},
+		.diff{0.5f,0.5f,0.5f},
+		.type{LineType::LineSegment},
 		.color{0xffffffff},
 	};
 
-	Sphere sphere;
+	Line line;
 
 	/*-------------------------------------------------------------*/
 	// グリッド線
@@ -87,9 +87,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		camera.Update();
 
 		// OBBと球の当たり判定
-		if (collision.OBB2SphereCheckCollision(obb.GetRotate(), obbInfo, sphereInfo)) {
+		if (collision.OBB2LineCheckCollision(obb.GetRotate(), obbInfo, lineInfo)) {
 
-			obbColor = 0x00ffffff;
+			obbColor = 0xff0000ff;
 		} else {
 
 			obbColor = 0xffffffff;
@@ -102,6 +102,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::DragFloat3("obb.center", &obbInfo.center.x, 0.01f);
 		ImGui::DragFloat3("obb.size", &obbInfo.size.x, 0.01f);
+
+		ImGui::End();
+
+		ImGui::Begin("LineSegment");
+
+		ImGui::DragFloat3("line.origin", &lineInfo.origin.x, 0.01f);
+		ImGui::DragFloat3("line.diff", &lineInfo.diff.x, 0.01f);
 
 		ImGui::End();
 
@@ -120,10 +127,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// OBBの描画
-		obb.DrawOBB(obbInfo,Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()), camera.GetViewportMatrix(), obbColor);
+		obb.DrawOBB(obbInfo, Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()), camera.GetViewportMatrix(), obbColor);
 
-		// 球の描画
-		sphere.DrawSphere(sphereInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+		// 線の描画
+		line.DrawLine(lineInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
 		Novice::EndFrame();
