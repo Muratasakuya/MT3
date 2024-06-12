@@ -89,7 +89,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// OBBと球の当たり判定
 		if (collision.OBB2SphereCheckCollision(obb.GetRotate(), obbInfo, sphereInfo)) {
 
-			obbColor = 0x00ffffff;
+			obbColor = 0xff0000ff;
 		} else {
 
 			obbColor = 0xffffffff;
