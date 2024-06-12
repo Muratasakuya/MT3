@@ -4,7 +4,7 @@
 /// <summary>
 /// 衝突判定クラス
 /// </summary>
-class Collision{
+class Collision {
 private:
 	/// <summary>
 	/// メンバ変数
@@ -14,7 +14,7 @@ public:
 	/// <summary>
 	/// メンバ関数
 	/// </summary>
-	
+
 	// 球と球の当たり判定
 	bool Sphere2SphereCheckCollision(const SphereInfo& s1, const SphereInfo& s2);
 
@@ -35,4 +35,7 @@ public:
 
 	// AABBと線の当たり判定
 	bool AABB2LineCheckCollision(const AABBInfo& aabb, const LineInfo& line);
+
+	// OBBと球の当たり判定
+	bool OBB2SphereCheckCollision(const OBBInfo& obb, const SphereInfo& sphere);
 };

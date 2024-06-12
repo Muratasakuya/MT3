@@ -6,7 +6,7 @@
 void Sphere::DrawSphere(SphereInfo& sphere, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Matrix4x4& viewportMatrix) {
 
 	// 分割数
-	const uint32_t kSubdivision = 12;
+	const uint32_t kSubdivision = 32;
 	// 緯度分割1つ文の角度
 	const float kLatEvery = Pi() / kSubdivision;
 	// 経度分割1つ分の角度

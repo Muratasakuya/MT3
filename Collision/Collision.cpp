@@ -192,3 +192,44 @@ bool Collision::AABB2LineCheckCollision(const AABBInfo& aabb, const LineInfo& li
 	// 交差しているかを確認
 	return (tNear <= tFar && tFar >= 0.0f && tNear <= 1.0f);
 }
+
+/// <summary>
+/// OBBと球の当たり判定
+/// </summary>
+/// <param name="obb"></param>
+/// <param name="sphere"></param>
+/// <returns></returns>
+bool Collision::OBB2SphereCheckCollision(const OBBInfo& obb, const SphereInfo& sphere) {
+
+	Vector3 localSphereCenter = sphere.center - obb.center;
+
+	Vector3 closestPoint = obb.center;
+	for (int i = 0; i < 3; ++i)
+	{
+		float distance = Dot(localSphereCenter, obb.orientations[i]);
+		if (i == 0)
+		{
+			if (distance > obb.size.x)
+				distance = obb.size.x;
+			if (distance < -obb.size.x)
+				distance = -obb.size.x;
+		} else if (i == 1)
+		{
+			if (distance > obb.size.y)
+				distance = obb.size.y;
+			if (distance < -obb.size.y)
+				distance = -obb.size.y;
+		} else if (i == 2)
+		{
+			if (distance > obb.size.z)
+				distance = obb.size.z;
+			if (distance < -obb.size.z)
+				distance = -obb.size.z;
+		}
+		closestPoint = closestPoint + distance * obb.orientations[i];
+	}
+
+	Vector3 diff = closestPoint - sphere.center;
+	float distanceSquared = Dot(diff, diff);
+	return distanceSquared <= (sphere.radius * sphere.radius);
+}

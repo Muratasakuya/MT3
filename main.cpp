@@ -1,5 +1,6 @@
 #include "MyMath.h"
 
+#include "OBB.h"
 #include "AABB.h"
 #include "Sphere.h"
 #include "Grid.h"
@@ -33,24 +34,34 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Collision collision;
 
 	/*-------------------------------------------------------------*/
-	// AABB
+	// OBB
 
-	AABBInfo aabbInfo;
-	aabbInfo = {
-		.min{-0.5f,-0.5f,-0.5f},
-		.max{0.5f,0.5f,0.5f}
+	OBBInfo obbInfo;
+	obbInfo = {
+		.center{-1.0f,0.0f,0.0f},
+		.orientations =
+		{{1.0f,0.0f,0.0f},
+		{0.0f,1.0f,0.0f},
+		{0.0f,0.0f,1.0f}},
+		.size{0.5f,0.5f,0.5f}
 	};
-	uint32_t aabbColor = 0xffffffff;
+	uint32_t obbColor = 0xffffffff;
 
-	AABB aabb;
+	OBB obb;
 
+	obb.SetTranslate(obbInfo.center);
 	/*-------------------------------------------------------------*/
-	// 線
+	// 球
 
-	LineInfo lineInfo;
-	lineInfo = { {-0.7f,0.3f,0.0f },{2.0f,-0.5f,0.0f},LineType::LineSegment ,0xffffffff };
+	SphereInfo sphereInfo;
+	sphereInfo = {
 
-	Line line;
+		.radius{0.5f},
+		.center{0.0f,0.0f,0.0f},
+		.color{0xffffffff},
+	};
+
+	Sphere sphere;
 
 	/*-------------------------------------------------------------*/
 	// グリッド線
@@ -72,38 +83,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// カメラの更新処理
 		camera.Update();
 
-		// AABBと線の当たり判定
-		if (collision.AABB2LineCheckCollision(aabbInfo, lineInfo)) {
+		// OBBと球の当たり判定
+		if (collision.OBB2SphereCheckCollision(obbInfo, sphereInfo)) {
 
-			aabbColor = 0x00ffffff;
+			obbColor = 0x00ffffff;
 		} else {
 
-			aabbColor = 0xffffffff;
+			obbColor = 0xffffffff;
 		}
 
 		/*-------------------------------------------------------------*/
 		// ImGui
 
-		ImGui::Begin("AABB");
+		ImGui::Begin("OBB");
 
-		ImGui::DragFloat3("aabb1.min", &aabbInfo.min.x,0.1f);
-		ImGui::DragFloat3("aabb1.max", &aabbInfo.max.x, 0.1f);
-		ImGui::DragFloat3("origin", &lineInfo.origin.x, 0.01f);
-		ImGui::DragFloat3("diff", &lineInfo.diff.x, 0.01f);
+		ImGui::DragFloat3("obb.center", &obbInfo.center.x, 0.01f);
+		ImGui::DragFloat3("obb.size", &obbInfo.size.x, 0.01f);
 
 		ImGui::End();
 
 #pragma region /// 値の制限 ///
-		// 値の制限
-		aabbInfo.min.x = (std::min)(aabbInfo.min.x, aabbInfo.max.x);
-		aabbInfo.max.x = (std::max)(aabbInfo.min.x, aabbInfo.max.x);
-
-		aabbInfo.min.y = (std::min)(aabbInfo.min.y, aabbInfo.max.y);
-		aabbInfo.max.y = (std::max)(aabbInfo.min.y, aabbInfo.max.y);
-
-		aabbInfo.min.z = (std::min)(aabbInfo.min.z, aabbInfo.max.z);
-		aabbInfo.max.z = (std::max)(aabbInfo.min.z, aabbInfo.max.z);
+		obbInfo.size.x = (std::max)(obbInfo.size.x, 0.0f);
+		obbInfo.size.y = (std::max)(obbInfo.size.y, 0.0f);
+		obbInfo.size.z = (std::max)(obbInfo.size.z, 0.0f);
 #pragma endregion
+
+		obb.SetTranslate(obbInfo.center);
 
 		/*-------------------------------------------------------------*/
 		// 描画処理
@@ -111,11 +116,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// グリッド線の描画
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		// AABBびの描画
-		aabb.DrawAABB(aabbInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), aabbColor);
+		// OBBの描画
+		obb.DrawOBB(obbInfo,Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()), camera.GetViewportMatrix(), obbColor);
 
-		// ラインの描画
-		line.DrawLine(lineInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+		// 球の描画
+		sphere.DrawSphere(sphereInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
 		Novice::EndFrame();

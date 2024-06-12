@@ -14,6 +14,17 @@
 // その他
 /*=========================================================================*/
 
+enum Vertexs {
+	frontLeftBottom,
+	frontLeftTop,
+	frontRightBottom,
+	frontRightTop,
+	backLeftBottom,
+	backLeftTop,
+	backRightBottom,
+	backRightTop,
+};
+
 /// lineの種類
 enum class LineType {
 
@@ -60,10 +71,19 @@ struct LineInfo {
 	uint32_t color;
 };
 
+/// AABB
 struct AABBInfo {
 
 	Vector3 min;
 	Vector3 max;
+};
+
+/// OBB
+struct OBBInfo {
+
+	Vector3 center;          // 中心点
+	Vector3 orientations[3]; // 座標軸、正規化・直行必須
+	Vector3 size;            // 座標軸方向の長さの半分、中心から面までの距離
 };
 
 /// πの値の取得
@@ -139,3 +159,7 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 
 /// 4x4行列の座標変換
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
+
+
+/// ベクトル変換
+Vector3 TransferNormal(const Vector3& v, const Matrix4x4& m);
