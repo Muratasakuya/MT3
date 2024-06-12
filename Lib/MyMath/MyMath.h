@@ -14,17 +14,6 @@
 // その他
 /*=========================================================================*/
 
-enum Vertexs {
-	frontLeftBottom,
-	frontLeftTop,
-	frontRightBottom,
-	frontRightTop,
-	backLeftBottom,
-	backLeftTop,
-	backRightBottom,
-	backRightTop,
-};
-
 /// lineの種類
 enum class LineType {
 

@@ -49,7 +49,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	OBB obb;
 
+	obb.Initialize();
+
 	obb.SetTranslate(obbInfo.center);
+
 	/*-------------------------------------------------------------*/
 	// 球
 
@@ -84,7 +87,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		camera.Update();
 
 		// OBBと球の当たり判定
-		if (collision.OBB2SphereCheckCollision(obbInfo, sphereInfo)) {
+		if (collision.OBB2SphereCheckCollision(obb.GetRotate(), obbInfo, sphereInfo)) {
 
 			obbColor = 0x00ffffff;
 		} else {

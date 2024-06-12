@@ -37,5 +37,5 @@ public:
 	bool AABB2LineCheckCollision(const AABBInfo& aabb, const LineInfo& line);
 
 	// OBBと球の当たり判定
-	bool OBB2SphereCheckCollision(const OBBInfo& obb, const SphereInfo& sphere);
+	bool OBB2SphereCheckCollision(const Vector3& rotate,const OBBInfo& obb, const SphereInfo& sphere);
 };

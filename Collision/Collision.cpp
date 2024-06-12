@@ -199,37 +199,43 @@ bool Collision::AABB2LineCheckCollision(const AABBInfo& aabb, const LineInfo& li
 /// <param name="obb"></param>
 /// <param name="sphere"></param>
 /// <returns></returns>
-bool Collision::OBB2SphereCheckCollision(const OBBInfo& obb, const SphereInfo& sphere) {
+bool Collision::OBB2SphereCheckCollision(const Vector3& rotate, const OBBInfo& obb, const SphereInfo& sphere) {
+
+	// OBBの軸を回転させる
+	Matrix4x4 rotateMatrix;
+	Matrix4x4 rotateX = MakePitchMatrix(rotate.x);
+	Matrix4x4 rotateY = MakeYawMatrix(rotate.y);
+	Matrix4x4 rotateZ = MakeRollMatrix(rotate.z);
+	rotateMatrix = Multiply(rotateX, Multiply(rotateY, rotateZ));
+
+	Vector3 orientations[3];
+	orientations[0] = Transform(obb.orientations[0], rotateMatrix);
+	orientations[1] = Transform(obb.orientations[1], rotateMatrix);
+	orientations[2] = Transform(obb.orientations[2], rotateMatrix);
 
 	Vector3 localSphereCenter = sphere.center - obb.center;
-
 	Vector3 closestPoint = obb.center;
-	for (int i = 0; i < 3; ++i)
-	{
-		float distance = Dot(localSphereCenter, obb.orientations[i]);
-		if (i == 0)
-		{
-			if (distance > obb.size.x)
-				distance = obb.size.x;
-			if (distance < -obb.size.x)
-				distance = -obb.size.x;
-		} else if (i == 1)
-		{
-			if (distance > obb.size.y)
-				distance = obb.size.y;
-			if (distance < -obb.size.y)
-				distance = -obb.size.y;
-		} else if (i == 2)
-		{
-			if (distance > obb.size.z)
-				distance = obb.size.z;
-			if (distance < -obb.size.z)
-				distance = -obb.size.z;
+
+	// 各軸ごとに処理を行う
+	for (int i = 0; i < 3; ++i) {
+
+		float distance = Dot(localSphereCenter, orientations[i]);
+		float halfSize = (i == 0) ? obb.size.x : (i == 1) ? obb.size.y : obb.size.z;
+
+		// クランプ処理
+		if (distance > halfSize) {
+
+			distance = halfSize;
+		} else if (distance < -halfSize) {
+
+			distance = -halfSize;
 		}
-		closestPoint = closestPoint + distance * obb.orientations[i];
+
+		closestPoint += distance * orientations[i];
 	}
 
 	Vector3 diff = closestPoint - sphere.center;
 	float distanceSquared = Dot(diff, diff);
+
 	return distanceSquared <= (sphere.radius * sphere.radius);
 }

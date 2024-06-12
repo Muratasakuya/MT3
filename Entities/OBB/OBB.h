@@ -24,6 +24,8 @@ public:
 	/// メンバ関数
 	/// </summary>
 
+	// 初期化
+	void Initialize();
 	
 	// OBBの描画
 	void DrawOBB(const OBBInfo& obb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
@@ -31,6 +33,7 @@ public:
 	// getter
 
 	Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
+	Vector3 GetRotate() const { return rotate_; }
 
 	// setter
 
