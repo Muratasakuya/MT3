@@ -273,7 +273,7 @@ bool Collision::OBB2LineCheckCollision(const Vector3& rotate, const OBBInfo& obb
 	Vector3 boxMin = { -obb.size.x, -obb.size.y, -obb.size.z };
 	Vector3 boxMax = { obb.size.x, obb.size.y, obb.size.z };
 
-	// 線分とAABBの当たり判定を行う（Slab method）
+	// 線分とAABBの当たり判定を行う
 	float tMin = 0.0f;
 	float tMax = 1.0f;
 
