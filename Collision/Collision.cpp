@@ -189,7 +189,66 @@ bool Collision::AABB2AABBCheckCollision(const AABBInfo& aabb1, const AABBInfo& a
 /// <returns></returns>
 bool Collision::OBB2OBBCheckCollision(const OBBInfo& obb1, const OBBInfo& obb2) {
 
-	return !HasSeparatingAxis(obb1, obb2);
+	// SATによる分離軸の検出
+	const float EPSILON = 1e-6f;
+
+	// 15個の分離軸
+	Vector3 axes[15];
+	for (int i = 0; i < 3; ++i) {
+		axes[i] = obb1.orientations[i];
+		axes[i + 3] = obb2.orientations[i];
+	}
+
+	int axisIndex = 6;
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			axes[axisIndex] = Cross(obb1.orientations[i], obb2.orientations[j]);
+			if (Length(axes[axisIndex]) > EPSILON) {
+				axes[axisIndex] = Normalize(axes[axisIndex]);
+			}
+			++axisIndex;
+		}
+	}
+
+	// 各軸に対する分離軸テスト
+	for (int i = 0; i < 15; ++i) {
+		Vector3 axis = axes[i];
+		if (Length(axis) < EPSILON) {
+			continue;
+		}
+
+		// OBB1を投影
+		float obb1Min = INFINITY, obb1Max = -INFINITY;
+		for (int j = 0; j < 8; ++j) {
+			Vector3 vertex = obb1.center +
+				obb1.orientations[0] * (j & 1 ? obb1.size.x : -obb1.size.x) +
+				obb1.orientations[1] * (j & 2 ? obb1.size.y : -obb1.size.y) +
+				obb1.orientations[2] * (j & 4 ? obb1.size.z : -obb1.size.z);
+			float projection = Dot(vertex, axis);
+			obb1Min = (std::min)(obb1Min, projection);
+			obb1Max = (std::max)(obb1Max, projection);
+		}
+
+		// OBB2を投影
+		float obb2Min = INFINITY, obb2Max = -INFINITY;
+		for (int j = 0; j < 8; ++j) {
+			Vector3 vertex = obb2.center +
+				obb2.orientations[0] * (j & 1 ? obb2.size.x : -obb2.size.x) +
+				obb2.orientations[1] * (j & 2 ? obb2.size.y : -obb2.size.y) +
+				obb2.orientations[2] * (j & 4 ? obb2.size.z : -obb2.size.z);
+			float projection = Dot(vertex, axis);
+			obb2Min = (std::min)(obb2Min, projection);
+			obb2Max = (std::max)(obb2Max, projection);
+		}
+
+		// 分離軸テスト
+		if (obb1Max < obb2Min || obb2Max < obb1Min) {
+			return false;
+		}
+	}
+
+	// 全ての分離軸で交差しているので衝突している
+	return true;
 }
 
 /// <summary>
