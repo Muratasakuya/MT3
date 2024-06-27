@@ -36,35 +36,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	/*-------------------------------------------------------------*/
 	// OBB
 
-	OBBInfo obbInfo;
-	obbInfo = {
+	// OBBの数
+	const uint32_t OBBNUM = 2;
+
+	OBBInfo obbInfo[OBBNUM];
+	obbInfo[0] = {
 		.center{-1.0f,0.0f,0.0f},
 		.orientations =
 		{{1.0f,0.0f,0.0f},
 		{0.0f,1.0f,0.0f},
 		{0.0f,0.0f,1.0f}},
-		.size{0.5f,0.5f,0.5f}
+		.size{0.83f,0.26f,0.24f}
 	};
-	uint32_t obbColor = 0xffffffff;
-
-	OBB obb;
-
-	obb.Initialize();
-
-	obb.SetTranslate(obbInfo.center);
-
-	/*-------------------------------------------------------------*/
-	// 線
-
-	LineInfo lineInfo;
-	lineInfo = {
-		.origin{-0.8f,-0.3f,0.0f},
-		.diff{0.5f,0.5f,0.5f},
-		.type{LineType::LineSegment},
-		.color{0xffffffff},
+	obbInfo[1] = {
+		.center{0.9f,0.66f,0.78f},
+		.orientations =
+		{{1.0f,0.0f,0.0f},
+		{0.0f,1.0f,0.0f},
+		{0.0f,0.0f,1.0f}},
+		.size{0.5f,0.37f,0.5f}
 	};
 
-	Line line;
+	uint32_t obbColor[OBBNUM];
+
+	Vector3 obbRotate[OBBNUM]{};
+	obbRotate[0] = { 0.0f,0.0f,0.0f };
+	obbRotate[1] = { -0.05f,-2.49f,0.15f };
+
+	// OBB
+	OBB obb[OBBNUM];
+
+	for (int i = 0; i < OBBNUM; i++) {
+
+		// 生成
+		obb[i].SetTranslate(obbInfo[i].center);
+		obb[i].SetRotate(obbRotate[i]);
+
+		obbColor[i] = 0xffffffff;
+	}
 
 	/*-------------------------------------------------------------*/
 	// グリッド線
@@ -81,44 +90,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Novice::GetHitKeyStateAll(keys);
 
 		/*-------------------------------------------------------------*/
+		// ImGui
+
+		ImGui::Begin("OBBInfo");
+
+		ImGui::DragFloat3("obb1.rotate", &obbRotate[0].x, 0.01f);
+		ImGui::DragFloat3("obb2.rotate", &obbRotate[1].x, 0.01f);
+		ImGui::DragFloat3("obb1.center", &obbInfo[0].center.x, 0.01f);
+		ImGui::DragFloat3("obb2.center", &obbInfo[1].center.x, 0.01f);
+
+		ImGui::End();
+
+		/*-------------------------------------------------------------*/
 		// 更新処理
 
 		// カメラの更新処理
 		camera.Update();
 
-		// OBBと球の当たり判定
-		if (collision.OBB2LineCheckCollision(obb.GetRotate(), obbInfo, lineInfo)) {
+		// OBBの更新処理
+		for (int i = 0; i < OBBNUM; i++) {
 
-			obbColor = 0xff0000ff;
-		} else {
+			// 生成
+			obb[i].SetTranslate(obbInfo[i].center);
+			obb[i].SetRotate(obbRotate[i]);
 
-			obbColor = 0xffffffff;
+			// 値の制限
+			obbInfo[i].size.x = (std::max)(obbInfo[i].size.x, 0.0f);
+			obbInfo[i].size.y = (std::max)(obbInfo[i].size.y, 0.0f);
+			obbInfo[i].size.z = (std::max)(obbInfo[i].size.z, 0.0f);
 		}
 
-		/*-------------------------------------------------------------*/
-		// ImGui
+		// 衝突判定
+		if (collision.OBB2OBBCheckCollision(obbInfo[0], obbInfo[1])) {
 
-		ImGui::Begin("OBB");
+			obbColor[0] = 0xff0000ff;
+		} else {
 
-		ImGui::DragFloat3("obb.center", &obbInfo.center.x, 0.01f);
-		ImGui::DragFloat3("obb.size", &obbInfo.size.x, 0.01f);
-
-		ImGui::End();
-
-		ImGui::Begin("LineSegment");
-
-		ImGui::DragFloat3("line.origin", &lineInfo.origin.x, 0.01f);
-		ImGui::DragFloat3("line.diff", &lineInfo.diff.x, 0.01f);
-
-		ImGui::End();
-
-#pragma region /// 値の制限 ///
-		obbInfo.size.x = (std::max)(obbInfo.size.x, 0.0f);
-		obbInfo.size.y = (std::max)(obbInfo.size.y, 0.0f);
-		obbInfo.size.z = (std::max)(obbInfo.size.z, 0.0f);
-#pragma endregion
-
-		obb.SetTranslate(obbInfo.center);
+			obbColor[0] = 0xffffffff;
+		}
 
 		/*-------------------------------------------------------------*/
 		// 描画処理
@@ -127,10 +136,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// OBBの描画
-		obb.DrawOBB(obbInfo, Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()), camera.GetViewportMatrix(), obbColor);
+		for (int i = 0; i < OBBNUM; i++) {
 
-		// 線の描画
-		line.DrawLine(lineInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+			obb[i].DrawOBB(obbInfo[i], Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()), camera.GetViewportMatrix(), obbColor[i]);
+		}
 
 		// フレームの終了
 		Novice::EndFrame();
@@ -143,5 +152,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// ライブラリの終了
 	Novice::Finalize();
+
 	return 0;
 }

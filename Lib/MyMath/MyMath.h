@@ -5,6 +5,10 @@
 #include <math.h>
 #include <algorithm>
 #include <stdint.h>
+#include <array>
+#include <memory>
+#include <cstdio>
+#include <string>
 #include <imgui.h>
 
 #include "Vector.h"

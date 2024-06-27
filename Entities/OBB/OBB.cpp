@@ -3,14 +3,6 @@
 #include "ImGuiManager.h"
 
 /// <summary>
-/// 初期化
-/// </summary>
-void OBB::Initialize() {
-
-	rotate_ = { 0.0f,0.0f,0.0f };
-}
-
-/// <summary>
 /// OBBの描画
 /// </summary>
 /// <param name="obb"></param>
@@ -18,12 +10,6 @@ void OBB::Initialize() {
 /// <param name="viewportMatrix"></param>
 /// <param name="color"></param>
 void OBB::DrawOBB(const OBBInfo& obb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
-
-	ImGui::Begin("OBB");
-
-	ImGui::DragFloat3("Rotation", &rotate_.x, 0.01f);
-
-	ImGui::End();
 
 	// 回転行列の計算（オイラー角から回転行列を計算）
 	Matrix4x4 rotateX = MakePitchMatrix(rotate_.x);

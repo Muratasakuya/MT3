@@ -74,6 +74,17 @@ struct Vector3 final {
 		z += v.z;
 		return *this;
 	}
+
+	// 外積
+	Vector3 cross(const Vector3& v) const {
+		return { y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x };
+	}
+
+	// 内積
+	float dot(const Vector3& v) const {
+		return x * v.x + y * v.y + z * v.z;
+	}
+
 };
 
 /// <summary>

@@ -11,7 +11,7 @@
 /// <param name="normal"></param>
 /// <param name="pointOnPlane"></param>
 /// <returns></returns>
-bool LinePlaneIntersection(Vector3& intersection, const Vector3& p0, const Vector3& p1, const Vector3& normal, const Vector3& pointOnPlane) {
+bool Collision::LinePlaneIntersection(Vector3& intersection, const Vector3& p0, const Vector3& p1, const Vector3& normal, const Vector3& pointOnPlane) {
 	Vector3 lineDir = p1 - p0;
 	float d = Dot(normal, pointOnPlane);
 	float t = (d - Dot(normal, p0)) / Dot(normal, lineDir);
@@ -20,6 +20,48 @@ bool LinePlaneIntersection(Vector3& intersection, const Vector3& p0, const Vecto
 		return true;
 	}
 	return false;
+}
+
+/// <summary>
+/// 軸があるかどうか
+/// </summary>
+/// <param name="obb1"></param>
+/// <param name="obb2"></param>
+/// <returns></returns>
+bool Collision::HasSeparatingAxis(const OBBInfo& obb1, const OBBInfo& obb2) {
+
+	Vector3 axes[15];
+	for (int i = 0; i < 3; ++i) {
+		axes[i] = obb1.orientations[i];
+		axes[i + 3] = obb2.orientations[i];
+	}
+	int index = 6;
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			axes[index++] = Cross(obb1.orientations[i], obb2.orientations[j]);
+		}
+	}
+
+	for (int i = 0; i < 15; ++i) {
+		if (IsSeparatingAxis(axes[i], obb1, obb2)) {
+			return true;
+		}
+	}
+	return false;
+}
+bool Collision::IsSeparatingAxis(const Vector3& axis, const OBBInfo& obb1, const OBBInfo& obb2) {
+
+	float projection1 = GetProjectionRadius(axis, obb1);
+	float projection2 = GetProjectionRadius(axis, obb2);
+	float distance = std::fabs(Dot(axis, obb2.center - obb1.center));
+
+	return distance > projection1 + projection2;
+}
+float Collision::GetProjectionRadius(const Vector3& axis, const OBBInfo& obb) {
+
+	return obb.size.x * std::fabs(Dot(axis, obb.orientations[0])) +
+		obb.size.y * std::fabs(Dot(axis, obb.orientations[1])) +
+		obb.size.z * std::fabs(Dot(axis, obb.orientations[2]));
 }
 
 /// <summary>
@@ -140,11 +182,22 @@ bool Collision::AABB2AABBCheckCollision(const AABBInfo& aabb1, const AABBInfo& a
 }
 
 /// <summary>
+/// OBB同士の当たり判定
+/// </summary>
+/// <param name="obb1"></param>
+/// <param name="obb2"></param>
+/// <returns></returns>
+bool Collision::OBB2OBBCheckCollision(const OBBInfo& obb1, const OBBInfo& obb2) {
+
+	return !HasSeparatingAxis(obb1, obb2);
+}
+
+/// <summary>
 /// AABBと球の当たり判定
 /// </summary>
 /// <param name="aabb1"></param>
 /// <param name="aabb2"></param>
-/// <returns></returns>
+/// <returns></rleturns>
 bool Collision::AABB2SphereCheckCollision(const AABBInfo& aabb, const SphereInfo& sphere) {
 
 	// 最近接点を求める

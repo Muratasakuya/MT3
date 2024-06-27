@@ -11,22 +11,19 @@ private:
 	/// <summary>
 	/// メンバ変数
 	/// </summary>
+	
+	Matrix4x4 rotateMatrix_{};
+	Matrix4x4 worldMatrix_{};
+	Matrix4x4 wvpMatrix_{};
 
-	Matrix4x4 rotateMatrix_;
-	Matrix4x4 worldMatrix_;
-	Matrix4x4 wvpMatrix_;
-
-	Vector3 rotate_;
-	Vector3 translate_;
+	Vector3 rotate_{};
+	Vector3 translate_{};
 
 public:
 	/// <summary>
 	/// メンバ関数
 	/// </summary>
 
-	// 初期化
-	void Initialize();
-	
 	// OBBの描画
 	void DrawOBB(const OBBInfo& obb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
@@ -38,4 +35,5 @@ public:
 	// setter
 
 	void SetTranslate(Vector3 translate) { translate_ = translate; }
+	void SetRotate(Vector3 rotate) { rotate_ = rotate; }
 };
