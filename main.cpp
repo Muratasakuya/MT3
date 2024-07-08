@@ -21,54 +21,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	/*-------------------------------------------------------------*/
-	// カメラ
-
-	Camera camera;
-	// 初期化
-	camera.Init();
-
-	/*-------------------------------------------------------------*/
-	// グリッド線
-
-	Grid grid;
-
-	/*-------------------------------------------------------------*/
-	// 肩、肘、手
-
-	// 座標
-	Vector3 translates[3] = {
-
-		{0.2f,1.0f,0.0f},
-		{0.4f,0.0f,0.0f},
-		{0.3f,0.0f,0.0f}
-	};
-
-	// 回転角
-	Vector3 rotates[3] = {
-
-		{0.0f,0.0f,-6.8f},
-		{0.0f,0.0f,-1.4f},
-		{0.0f,0.0f,0.0f}
-	};
-
-	// 色
-	uint32_t colors[3] = {
-
-		0xff0000ff,
-		0x00ff00ff,
-		0x0000ffff
-	};
-
-	// 球
-	Matrix4x4 worldMatrices[3];
-	SphereInfo sphereInfo[3];
-	Sphere sphere[3];
-	for (int i = 0; i < 3; i++) {
-
-		sphereInfo[i] = { 0.05f,translates[i],rotates[i],colors[i] };
-		worldMatrices[i] = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, rotates[i], translates[i]);
-	}
+	Vector3 a{ 0.2f,1.0f,0.0f };
+	Vector3 b{ 2.4f,3.1f,1.2f };
+	Vector3 c = a + b;
+	Vector3 d = a - b;
+	Vector3 e = a * 2.4f;
+	Vector3 rotate{ 0.4f,1.43f,-0.8f };
+	Matrix4x4 rotateXMatrix = MakePitchMatrix(rotate.x);
+	Matrix4x4 rotateYMatrix = MakeYawMatrix(rotate.y);
+	Matrix4x4 rotateZMatrix = MakeRollMatrix(rotate.z);
+	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -82,68 +44,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*-------------------------------------------------------------*/
 		// ImGui
 
-		ImGui::Begin("Hierarchy");
+		ImGui::Begin("Window");
 
-		ImGui::DragFloat3("Shoulder translate", &translates[0].x, 0.05f);
-		ImGui::DragFloat3("Arm translate", &translates[1].x, 0.05f);
-		ImGui::DragFloat3("Hand translate", &translates[2].x, 0.05f);
-		ImGui::DragFloat3("Shoulder rotate", &rotates[0].x, 0.01f);
-		ImGui::DragFloat3("Arm rotate", &rotates[1].x, 0.01f);
-		ImGui::DragFloat3("Hand rotate", &rotates[2].x, 0.01f);
+		ImGui::Text("c : %f , %f, %f", c.x, c.y, c.z);
+		ImGui::Text("d : %f , %f, %f", d.x, d.y, d.z);
+		ImGui::Text("e : %f , %f, %f", e.x, e.y, e.z);
+
+		ImGui::Text("rotateMatrix:");
+		ImGui::Text("%f, %f, %f, %f", rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3]);
+		ImGui::Text("%f, %f, %f, %f", rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3]);
+		ImGui::Text("%f, %f, %f, %f", rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3]);
+		ImGui::Text("%f, %f, %f, %f", rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]);
 
 		ImGui::End();
 
 		/*-------------------------------------------------------------*/
-		// 更新処理
-
-		// カメラの更新処理
-		camera.Update();
-
-		worldMatrices[0] = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, rotates[0], translates[0]);
-		worldMatrices[1] = Multiply(MakeAffineMatrix({ 1.0f,1.0f,1.0f }, rotates[1], translates[1]), worldMatrices[0]);
-		worldMatrices[2] = Multiply(MakeAffineMatrix({ 1.0f,1.0f,1.0f }, rotates[2], translates[2]), worldMatrices[1]);
-
-		/*-------------------------------------------------------------*/
-		// 描画処理
-
-		// グリッド線の描画
-		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
-
-		// 制御点の球の描画
-		for (int i = 0; i < 3; i++) {
-
-			sphere[i].DrawSphere(worldMatrices[i], sphereInfo[i], camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
-		}
-
-
-		Matrix4x4 wvpMatrices[3];
-		Vector3 worldPos[3] = {
-
-			{worldMatrices[0].m[3][0],worldMatrices[0].m[3][1],worldMatrices[0].m[3][2]},
-			{worldMatrices[1].m[3][0],worldMatrices[1].m[3][1],worldMatrices[1].m[3][2]},
-			{worldMatrices[2].m[3][0],worldMatrices[2].m[3][1],worldMatrices[2].m[3][2]},
-		};
-		Matrix4x4 matrices[3];
-		Vector3 ndcPos;
-		Vector3 screenPos[3];
-
-		for (int i = 0; i < 3; i++) {
-
-			matrices[i] = MakeAffineMatrix({ 0.02f,0.02f,0.02f }, { 0.0f,0.0f,0.0f }, worldPos[i]);
-			wvpMatrices[i] = Multiply(matrices[i], Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()));
-			ndcPos = Transform(worldPos[i], wvpMatrices[i]);
-			screenPos[i] = Transform(ndcPos, camera.GetViewportMatrix());
-		}
-
-		Novice::DrawLine(
-			static_cast<int>(screenPos[0].x), static_cast<int>(screenPos[0].y),
-			static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
-			0xffffffff);
-
-		Novice::DrawLine(
-			static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
-			static_cast<int>(screenPos[2].x), static_cast<int>(screenPos[2].y),
-			0xffffffff);
 
 		// フレームの終了
 		Novice::EndFrame();
