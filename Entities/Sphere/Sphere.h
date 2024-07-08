@@ -21,7 +21,7 @@ private:
 		Vector3 screenPos_;
 	};
 
-	Point a{}, b{}, c{};
+	Point a{}, b{}, c{}, center;
 
 	Vector3 ndcPosA_{};
 	Vector3 ndcPosB_{};
@@ -38,5 +38,5 @@ public:
 	~Sphere() {}
 
 	// 球を描画する関数
-	void DrawSphere(SphereInfo& sphere, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Matrix4x4& viewportMatrix);
+	void DrawSphere(const Matrix4x4& worldMatrix, SphereInfo& sphere, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Matrix4x4& viewportMatrix);
 };

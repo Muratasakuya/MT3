@@ -39,6 +39,7 @@ struct SphereInfo {
 
 	float radius;
 	Vector3 center;
+	Vector3 rotate;
 	uint32_t color;
 };
 
