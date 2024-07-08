@@ -6,7 +6,7 @@
 /// <summary>
 /// 球を描画する関数
 /// </summary>
-void Sphere::DrawSphere(const Matrix4x4& worldMatrix, SphereInfo& sphere, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Matrix4x4& viewportMatrix) {
+void Sphere::DrawSphere(const Matrix4x4& worldMatrix, float radius, uint32_t color, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Matrix4x4& viewportMatrix) {
 
 	// 分割数
 	const uint32_t kSubdivision = 12;
@@ -20,9 +20,9 @@ void Sphere::DrawSphere(const Matrix4x4& worldMatrix, SphereInfo& sphere, const 
 
 	auto calculatePoint = [&](float lat, float lon) -> Vector3 {
 		return {
-			sphere.radius * std::cos(lat) * std::cos(lon),
-			sphere.radius * std::sin(lat),
-			sphere.radius * std::cos(lat) * std::sin(lon)
+			radius* std::cos(lat) * std::cos(lon),
+			radius* std::sin(lat),
+			radius* std::cos(lat) * std::sin(lon)
 		};
 		};
 
@@ -55,13 +55,13 @@ void Sphere::DrawSphere(const Matrix4x4& worldMatrix, SphereInfo& sphere, const 
 			Novice::DrawLine(
 				static_cast<int>(screenPointA.x), static_cast<int>(screenPointA.y),
 				static_cast<int>(screenPointB.x), static_cast<int>(screenPointB.y),
-				sphere.color
+				color
 			);
 
 			Novice::DrawLine(
 				static_cast<int>(screenPointA.x), static_cast<int>(screenPointA.y),
 				static_cast<int>(screenPointC.x), static_cast<int>(screenPointC.y),
-				sphere.color
+				color
 			);
 		}
 	}

@@ -38,5 +38,5 @@ public:
 	~Sphere() {}
 
 	// 球を描画する関数
-	void DrawSphere(const Matrix4x4& worldMatrix, SphereInfo& sphere, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Matrix4x4& viewportMatrix);
+	void DrawSphere(const Matrix4x4& worldMatrix, float radius, uint32_t color, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Matrix4x4& viewportMatrix);
 };

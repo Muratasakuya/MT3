@@ -57,10 +57,16 @@ struct Vector3 final {
 		return Vector3(v.x * scalar, v.y * scalar, v.z * scalar);
 	}
 	Vector3 operator-(float scalar) const {
-		return Vector3(x * scalar, y - scalar, z - scalar);
+		return Vector3(x - scalar, y - scalar, z - scalar);
 	}
 	friend Vector3 operator-(float scalar, const Vector3& v) {
-		return Vector3(v.x -scalar, v.y - scalar, v.z -scalar);
+		return Vector3(v.x - scalar, v.y - scalar, v.z - scalar);
+	}
+	Vector3 operator/(float scalar) const {
+		return Vector3(x / scalar, y / scalar, z / scalar);
+	}
+	friend Vector3 operator/(float scalar, const Vector3& v) {
+		return Vector3(v.x / scalar, v.y / scalar, v.z / scalar);
 	}
 	Vector3& operator+=(const Vector3& v) {
 		x += v.x;

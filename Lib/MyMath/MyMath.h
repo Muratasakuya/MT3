@@ -67,6 +67,24 @@ struct AABBInfo {
 	Vector3 max;
 };
 
+struct Spring {
+
+	Vector3 anchor;           // アンカー。固定された端の位置
+	float naturalLength;      // 自然長
+	float stiffness;          // 剛性。バネ定数k
+	float dampingCoefficient; // 減衰係数
+};
+
+struct Ball {
+
+	Vector3 pos;
+	Vector3 velocity;
+	Vector3 acceleration;
+	float mass;
+	float radius;
+	uint32_t color;
+};
+
 /// πの値の取得
 float Pi();
 
