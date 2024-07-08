@@ -23,12 +23,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	float deltaTime = 1.0f / 60.0f;
 
-	Pendulum pendulum{};
-	pendulum.anchor = { 0.0f,1.0f,0.0f };
-	pendulum.lenght = 0.8f;
-	pendulum.angle = 0.7f;
-	pendulum.angularVelocity = 0.0f;
-	pendulum.angularAcceleration = 0.0f;
+	ConicalPendulum conicalPendulum{};
+	conicalPendulum.anchor = { 0.0f,1.0f,0.0f };
+	conicalPendulum.lenght = 0.8f;
+	conicalPendulum.halhApexAngle = 0.7f;
+	conicalPendulum.angle = 0.0f;
+	conicalPendulum.angularVelocity = 0.0f;
 
 	Camera camera;
 	camera.Init();
@@ -64,16 +64,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (isStart) {
 
-			pendulum.angularAcceleration =
-				-(9.8f / pendulum.lenght) * std::sin(pendulum.angle);
-			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
-			pendulum.angle += pendulum.angularVelocity * deltaTime;
+			conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.lenght * std::cos(conicalPendulum.halhApexAngle)));
+			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
 		}
 
+		float radius = std::sin(conicalPendulum.halhApexAngle) * conicalPendulum.lenght;
+		float height = std::cos(conicalPendulum.halhApexAngle) * conicalPendulum.lenght;
+
 		Vector3 pointPos{};
-		pointPos.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.lenght;
-		pointPos.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.lenght;
-		pointPos.z = pendulum.anchor.z;
+		pointPos.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
+		pointPos.y = conicalPendulum.anchor.y - height;
+		pointPos.z = conicalPendulum.anchor.z - std::sin(conicalPendulum.angle) * radius;
 
 		Matrix4x4 worldMatrix =
 			MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pointPos);
@@ -82,7 +83,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 matrices[2];
 		Vector3 worldPos[2] = {
 
-			pendulum.anchor,
+			conicalPendulum.anchor,
 			pointPos
 		};
 		Vector3 ndcPos;
