@@ -85,6 +85,15 @@ struct Ball {
 	uint32_t color;
 };
 
+struct Pendulum {
+
+	Vector3 anchor;            // アンカー。固定された端の位置
+	float lenght;              // 紐の長さ
+	float angle;               // 現在の角度
+	float angularVelocity;     // 角角度ω
+	float angularAcceleration; // 角加速度
+};
+
 /// πの値の取得
 float Pi();
 

@@ -23,22 +23,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	float deltaTime = 1.0f / 60.0f;
 
-	float angularVelocity = 3.14f;
-	float angle = 0.0f;
-
-	//bool isStart = false;
-
-	Vector3 centerPos = { 0.0f,0.0f,0.0f };
-	Vector3 pointPos = { 0.0f,0.0f,0.0f };
-	float radius = 0.8f;
-
-	bool isRotating = false;
+	Pendulum pendulum{};
+	pendulum.anchor = { 0.0f,1.0f,0.0f };
+	pendulum.lenght = 0.8f;
+	pendulum.angle = 0.7f;
+	pendulum.angularVelocity = 0.0f;
+	pendulum.angularAcceleration = 0.0f;
 
 	Camera camera;
 	camera.Init();
 
 	Grid grid;
 	Sphere sphere;
+
+	bool isStart = false;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -55,8 +53,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Window");
 
 		if (ImGui::Button("Start")) {
-			isRotating = true;
-			angle = 0.0f;
+
+			isStart = true;
 		}
 
 		ImGui::End();
@@ -64,22 +62,46 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*-------------------------------------------------------------*/
 		// 更新処理
 
-		if (isRotating) {
-			angle += angularVelocity * deltaTime;
-			if (angle >= 2.0f * angularVelocity) {
-				isRotating = false;
-				angle = 0.0f; 
-			}
+		if (isStart) {
+
+			pendulum.angularAcceleration =
+				-(9.8f / pendulum.lenght) * std::sin(pendulum.angle);
+			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
+			pendulum.angle += pendulum.angularVelocity * deltaTime;
 		}
 
-		pointPos.x = centerPos.x + std::cos(angle) * radius;
-		pointPos.y = centerPos.y + std::sin(angle) * radius;
-		pointPos.z = 0.0f;
+		Vector3 pointPos{};
+		pointPos.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.lenght;
+		pointPos.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.lenght;
+		pointPos.z = pendulum.anchor.z;
 
 		Matrix4x4 worldMatrix =
 			MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pointPos);
 
+		Matrix4x4 wvpMatrices[2];
+		Matrix4x4 matrices[2];
+		Vector3 worldPos[2] = {
+
+			pendulum.anchor,
+			pointPos
+		};
+		Vector3 ndcPos;
+		Vector3 screenPos[2];
+
+		for (int i = 0; i < 2; i++) {
+
+			matrices[i] = MakeAffineMatrix({ 0.02f,0.02f,0.02f }, { 0.0f,0.0f,0.0f }, worldPos[i]);
+			wvpMatrices[i] = Multiply(matrices[i], Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()));
+			ndcPos = Transform(worldPos[i], wvpMatrices[i]);
+			screenPos[i] = Transform(ndcPos, camera.GetViewportMatrix());
+		}
+
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+
+		Novice::DrawLine(
+			static_cast<int>(screenPos[0].x), static_cast<int>(screenPos[0].y),
+			static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
+			0xffffffff);
 
 		sphere.DrawSphere(worldMatrix, 0.05f, 0xffffffff,
 			camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
