@@ -21,22 +21,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
+	float deltaTime = 1.0f / 60.0f;
+
+	float angularVelocity = 3.14f;
+	float angle = 0.0f;
+
+	//bool isStart = false;
+
+	Vector3 centerPos = { 0.0f,0.0f,0.0f };
+	Vector3 pointPos = { 0.0f,0.0f,0.0f };
+	float radius = 0.8f;
+
+	bool isRotating = false;
+
 	Camera camera;
 	camera.Init();
-
-	Spring spring{};
-	spring.anchor = { 0.0f,0.0f,0.0f };
-	spring.naturalLength = 1.0f;
-	spring.stiffness = 100.0f;
-	spring.dampingCoefficient = 2.0f;
-
-	Ball ball{};
-	ball.pos = { 1.2f,0.0f,0.0f };
-	ball.mass = 2.0f;
-	ball.radius = 0.05f;
-	ball.color = 0x0000ffff;
-
-	float deltaTime = 1.0f / 60.0f;
 
 	Grid grid;
 	Sphere sphere;
@@ -56,9 +55,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Window");
 
 		if (ImGui::Button("Start")) {
-			
-			ball.pos.x = 1.2f;
-			ball.velocity.x = 0.01f;
+			isRotating = true;
+			angle = 0.0f;
 		}
 
 		ImGui::End();
@@ -66,54 +64,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*-------------------------------------------------------------*/
 		// 更新処理
 
-		Matrix4x4 wvpMatrices[2];
-		Matrix4x4 matrices[2];
-		Vector3 worldPos[2] = {
-
-			spring.anchor,
-			ball.pos
-		};
-		Vector3 ndcPos;
-		Vector3 screenPos[2];
-
-		for (int i = 0; i < 2; i++) {
-
-			matrices[i] = MakeAffineMatrix({ 0.02f,0.02f,0.02f }, { 0.0f,0.0f,0.0f }, worldPos[i]);
-			wvpMatrices[i] = Multiply(matrices[i], Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()));
-			ndcPos = Transform(worldPos[i], wvpMatrices[i]);
-			screenPos[i] = Transform(ndcPos, camera.GetViewportMatrix());
+		if (isRotating) {
+			angle += angularVelocity * deltaTime;
+			if (angle >= 2.0f * angularVelocity) {
+				isRotating = false;
+				angle = 0.0f; 
+			}
 		}
 
-		Vector3 diff = ball.pos - spring.anchor;
-		float length = Length(diff);
+		pointPos.x = centerPos.x + std::cos(angle) * radius;
+		pointPos.y = centerPos.y + std::sin(angle) * radius;
+		pointPos.z = 0.0f;
 
-		if (length != 0.0f) {
-
-			Vector3 direction = Normalize(diff);
-			Vector3 restPos = spring.anchor + direction * spring.naturalLength;
-			Vector3 displacement = length * (ball.pos - restPos);
-			Vector3 restoringForce = -spring.stiffness * displacement;
-			Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
-			Vector3 force = restoringForce + dampingForce;
-
-			ball.acceleration = force / ball.mass;
-		}
-
-		// 加速度も速度もどちらも秒を基準とした値
-		// それが、1/60秒完(deltaTime)適応されたと考える
-		ball.velocity += ball.acceleration * deltaTime;
-		ball.pos += ball.velocity * deltaTime;
-
-		Matrix4x4 ballWorldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, ball.pos);
+		Matrix4x4 worldMatrix =
+			MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pointPos);
 
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		Novice::DrawLine(
-			static_cast<int>(screenPos[0].x), static_cast<int>(screenPos[0].y),
-			static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
-			0xffffffff);
-
-		sphere.DrawSphere(ballWorldMatrix, ball.radius, ball.color,
+		sphere.DrawSphere(worldMatrix, 0.05f, 0xffffffff,
 			camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
