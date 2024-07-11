@@ -6,6 +6,7 @@
 #include "Grid.h"
 #include "Line.h"
 #include "Triangle.h"
+#include "Plane.h"
 #include "Camera.h"
 #include "Collision.h"
 
@@ -23,20 +24,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	float deltaTime = 1.0f / 60.0f;
 
-	ConicalPendulum conicalPendulum{};
-	conicalPendulum.anchor = { 0.0f,1.0f,0.0f };
-	conicalPendulum.lenght = 0.8f;
-	conicalPendulum.halhApexAngle = 0.7f;
-	conicalPendulum.angle = 0.0f;
-	conicalPendulum.angularVelocity = 0.0f;
+	Ball ball;
+	ball.acceleration = { 0.0f,-9.8f,0.0f };
 
 	Camera camera;
 	camera.Init();
 
 	Grid grid;
 	Sphere sphere;
+	Collision collision;
 
 	bool isStart = false;
+
+	PlaneInfo planeInfo{};
+	planeInfo = { {0.0f,1.0f,0.0f},1.0f };
+	Plane plane;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -64,48 +66,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (isStart) {
 
-			conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.lenght * std::cos(conicalPendulum.halhApexAngle)));
-			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
+			ball.velocity += ball.acceleration * deltaTime;
+			ball.pos += ball.velocity * deltaTime;
+
+			if (collision.Sphere2PlaneCheckCollision(SphereInfo{ 0.05f ,ball.pos }, planeInfo)) {
+
+				Vector3 reflected = Reflect(ball.velocity, planeInfo.normal);
+				Vector3 projectToNormal = Project(reflected, planeInfo.normal);
+				Vector3 movingDirection = reflected - projectToNormal;
+				ball.velocity = projectToNormal * e + movingDirection;
+
+				
+			}
 		}
-
-		float radius = std::sin(conicalPendulum.halhApexAngle) * conicalPendulum.lenght;
-		float height = std::cos(conicalPendulum.halhApexAngle) * conicalPendulum.lenght;
-
-		Vector3 pointPos{};
-		pointPos.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
-		pointPos.y = conicalPendulum.anchor.y - height;
-		pointPos.z = conicalPendulum.anchor.z - std::sin(conicalPendulum.angle) * radius;
 
 		Matrix4x4 worldMatrix =
-			MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, pointPos);
-
-		Matrix4x4 wvpMatrices[2];
-		Matrix4x4 matrices[2];
-		Vector3 worldPos[2] = {
-
-			conicalPendulum.anchor,
-			pointPos
-		};
-		Vector3 ndcPos;
-		Vector3 screenPos[2];
-
-		for (int i = 0; i < 2; i++) {
-
-			matrices[i] = MakeAffineMatrix({ 0.02f,0.02f,0.02f }, { 0.0f,0.0f,0.0f }, worldPos[i]);
-			wvpMatrices[i] = Multiply(matrices[i], Multiply(camera.GetViewMatrix(), camera.GetProjectionMatrix()));
-			ndcPos = Transform(worldPos[i], wvpMatrices[i]);
-			screenPos[i] = Transform(ndcPos, camera.GetViewportMatrix());
-		}
+			MakeAffineMatrix({ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, ball.pos);
 
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		Novice::DrawLine(
-			static_cast<int>(screenPos[0].x), static_cast<int>(screenPos[0].y),
-			static_cast<int>(screenPos[1].x), static_cast<int>(screenPos[1].y),
-			0xffffffff);
-
 		sphere.DrawSphere(worldMatrix, 0.05f, 0xffffffff,
 			camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
+
+		// 平面の描画
+		plane.DrawPlane(planeInfo, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// フレームの終了
 		Novice::EndFrame();

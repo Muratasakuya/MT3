@@ -137,6 +137,8 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 // 法線と垂直なベクトル
 Vector3 Perpendicular(const Vector3& v);
 
+Vector3 Reflect(const Vector3& input, const Vector3& normal);
+
 /*=========================================================================*/
 // マトリックス
 /*=========================================================================*/
