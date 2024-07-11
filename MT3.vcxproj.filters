@@ -68,6 +68,9 @@
     <ClCompile Include="Entities\Bezier\Bezier.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Entities\CatmullRom\CatmullRom.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -153,5 +156,6 @@
     <ClInclude Include="Entities\Triangle\Triangle.h" />
     <ClInclude Include="Entities\AABB\AABB.h" />
     <ClInclude Include="Entities\Bezier\Bezier.h" />
+    <ClInclude Include="Entities\CatmullRom\CatmullRom.h" />
   </ItemGroup>
 </Project>

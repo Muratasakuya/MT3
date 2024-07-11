@@ -1,6 +1,7 @@
 #include "MyMath.h"
 
 #include "Bezier.h"
+#include "CatmullRom.h"
 #include "AABB.h"
 #include "Sphere.h"
 #include "Grid.h"
@@ -34,24 +35,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Grid grid;
 
 	/*-------------------------------------------------------------*/
-	// ベジェ曲線
+	// スプライン曲線
 
 	// 各制御点
-	Vector3 controlPoints[3] = {
+	Vector3 controlPoints[4] = {
 		{-0.8f,0.58f,1.0f},
 		{1.76f,1.0f,-0.3f},
 		{0.94f,-0.7f,2.3f},
+		{-0.53f,-0.26f,-0.15f},
 	};
 
 	// 制御点の球
-	SphereInfo sphereInfo[3];
-	Sphere sphere[3];
-	for (int i = 0; i < 3; i++) {
+	SphereInfo sphereInfo[4];
+	Sphere sphere[4];
+	for (int i = 0; i < 4; i++) {
 
 		sphereInfo[i] = { 0.01f,controlPoints[i],0x000000ff };
 	}
-	
-	Bezier bezier;
+
+	CatmullRom catmullRom;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -71,12 +73,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		/*-------------------------------------------------------------*/
 		// ImGui
-
-		ImGui::Begin("Bezier");
+		
+		ImGui::Begin("CatmullRom");
 
 		ImGui::DragFloat3("controlPoints[0]", &controlPoints[0].x, 0.1f);
 		ImGui::DragFloat3("controlPoints[1]", &controlPoints[1].x, 0.1f);
 		ImGui::DragFloat3("controlPoints[2]", &controlPoints[2].x, 0.1f);
+		ImGui::DragFloat3("controlPoints[3]", &controlPoints[3].x, 0.1f);
 
 		ImGui::End();
 
@@ -92,13 +95,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// グリッド線の描画
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		// ベジェ曲線の描画
-		bezier.DrawBezier(
-			controlPoints[0], controlPoints[1], controlPoints[2],
+		// スプライン曲線の描画
+		catmullRom.DrawCatmullRom(
+			controlPoints[1], controlPoints[2], controlPoints[3], controlPoints[0],
+			camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), 0x0000ffff);
+		// スプライン曲線の描画
+		catmullRom.DrawCatmullRom(
+			controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3],
+			camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), 0x0000ffff);
+		// スプライン曲線の描画
+		catmullRom.DrawCatmullRom(
+			controlPoints[3], controlPoints[0], controlPoints[1], controlPoints[2],
 			camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix(), 0x0000ffff);
 
 		// 制御点の球の描画
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 4; i++) {
 
 			sphere[i].DrawSphere(sphereInfo[i], camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 		}
