@@ -25,7 +25,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	float deltaTime = 1.0f / 60.0f;
 
 	Ball ball;
+	ball.pos = { 0.8f,0.7f,0.3f };
+	ball.mass = 2.0f;
+	ball.radius = 0.05f;
 	ball.acceleration = { 0.0f,-9.8f,0.0f };
+	ball.velocity = { 0.0f,0.0f,0.0f };
 
 	Camera camera;
 	camera.Init();
@@ -37,7 +41,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	bool isStart = false;
 
 	PlaneInfo planeInfo{};
-	planeInfo = { {0.0f,1.0f,0.0f},1.0f };
+	planeInfo.normal = Normalize({ -0.2f,0.9f,-0.3f });
+	planeInfo.distance = 0.0f;
 	Plane plane;
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -59,6 +64,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			isStart = true;
 		}
 
+		ImGui::Text("%f,%f,%f", ball.pos.x, ball.pos.y, ball.pos.z);
+
 		ImGui::End();
 
 		/*-------------------------------------------------------------*/
@@ -74,9 +81,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				Vector3 reflected = Reflect(ball.velocity, planeInfo.normal);
 				Vector3 projectToNormal = Project(reflected, planeInfo.normal);
 				Vector3 movingDirection = reflected - projectToNormal;
-				ball.velocity = projectToNormal * e + movingDirection;
-
-				
+				ball.velocity = projectToNormal + movingDirection;
 			}
 		}
 
@@ -85,7 +90,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		grid.DrawGrid(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
-		sphere.DrawSphere(worldMatrix, 0.05f, 0xffffffff,
+		sphere.DrawSphere(worldMatrix, ball.radius, 0xffffffff,
 			camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewportMatrix());
 
 		// 平面の描画

@@ -84,7 +84,8 @@ Vector3 Perpendicular(const Vector3& v) {
 // 反射
 Vector3 Reflect(const Vector3& input, const Vector3& normal) {
 
-	return { 0.0f,0.0f,0.0f };
+	float dotProduct = Dot(input,normal);
+	return input - normal * (2 * dotProduct);
 }
 
 /*=========================================================================*/
