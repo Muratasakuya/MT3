@@ -57,6 +57,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*-------------------------------------------------------------*/
 		// ImGui
 
+		Vector3 reflect = Reflect({ 4,3,5 }, { sqrtf(6) / 6,sqrtf(6) / 3,sqrtf(6) / 6 });
+
 		ImGui::Begin("Window");
 
 		if (ImGui::Button("Start")) {
